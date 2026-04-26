@@ -1,0 +1,189 @@
+{% extends "base.html" %}
+{% block title %}عرض النسخة{% endblock %}
+
+{% block content %}
+<div class="container" dir="rtl" style="max-width:1200px; margin:auto; padding:20px; font-family:sans-serif;">
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: start;">
+    
+    <!-- العمود الأيسر: معلومات النسخة -->
+    <div style="background:#ffffff; border-radius:12px; box-shadow:0 6px 15px rgba(0,0,0,0.1); padding:24px;">
+      <h2 style="text-align:center; color:#222; margin-bottom:24px;">📘 تفاصيل النسخة</h2>
+
+      <div style="display: flex; flex-direction: column; gap: 16px;">
+        <div><strong>رقم الكتاب:</strong> {{ copybook['book_number'] }}</div>
+        <div><strong>تاريخ الكتاب:</strong> {{ copybook['book_date'] }}</div>
+        <div><strong>عنوان الكتاب:</strong> {{ copybook['book_title'] }}</div>
+        <div><strong>الملاحظات:</strong> {{ copybook['notes'] if copybook['notes'] else '—' }}</div>
+      </div>
+
+      <!-- أزرار التحكم -->
+      <div style="margin-top:24px; display:flex; gap:12px; flex-wrap:wrap;">
+        <a href="{{ url_for('edit_copybook', copybook_id=copybook['id'], emp_id=copybook['employee_id']) }}" class="btn btn-primary">
+          <i class="fas fa-edit"></i> تعديل النسخة
+        </a>
+        <a href="{{ url_for('index_copybook', emp_id=copybook['employee_id']) }}" class="btn btn-secondary">
+          <i class="fas fa-arrow-right"></i> عودة
+        </a>
+      </div>
+    </div>
+
+    <!-- العمود الأيمن: ملفات النسخة -->
+    <div style="background:#ffffff; border-radius:12px; box-shadow:0 6px 15px rgba(0,0,0,0.1); padding:24px;">
+      <h3 style="text-align:center; margin-bottom:20px; color:#555;">📁 ملفات النسخة</h3>
+      
+      {% if docs %}
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px;">
+        {% for doc in docs %}
+          {% set ext = doc['filename'].split('.')[-1].lower() %}
+          <div style="position:relative; border-radius:8px; overflow:hidden; box-shadow:0 2px 6px rgba(0,0,0,0.15); text-align:center;">
+            {% if ext in ['jpg','jpeg','png','gif','webp'] %}
+              <div class="image-container" data-image-src="{{ url_for('static', filename='documents/copybooks/' ~ doc['filename']) }}">
+                <img id="img_{{ doc.id }}" src="{{ url_for('static', filename='documents/copybooks/' ~ doc['filename']) }}" 
+                     style="width:100%; height:80px; object-fit:cover; cursor:pointer; transition:transform 0.3s;"
+                     alt="{{ doc['filename'] }}"
+                     title="انقر لعرض الصورة بتكبير">
+              </div>
+              <br>
+              <button type="button" class="btn btn-primary btn-sm" style="margin-top:4px; font-size:10px; padding:2px 6px;" onclick="printImage('img_{{ doc.id }}')">🖨️ طباعة</button>
+            {% else %}
+              <a href="{{ url_for('static', filename='documents/copybooks/' ~ doc['filename']) }}" target="_blank" class="d-block">
+                <div style="width:100%; height:80px; display:flex; align-items:center; justify-content:center; background:#f0f0f0; font-size:12px; cursor:pointer;">
+                  <i class="fas fa-file-pdf text-danger"></i>
+                  <small style="margin-right:4px;">{{ doc['filename'] }}</small>
+                </div>
+              </a>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+      {% else %}
+        <div class="alert alert-info text-center">
+          <i class="fas fa-info-circle"></i> لا توجد ملفات مرفقة
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+</div>
+
+<!-- نموذج عرض الصورة -->
+<div id="imageModal" class="modal" style="display:none; position:fixed; z-index:1000; left:0; top:0; width:100%; height:100%; background-color:rgba(0,0,0,0.9);">
+  <span class="close" style="position:absolute; top:20px; right:35px; color:#f1f1f1; font-size:40px; font-weight:bold; cursor:pointer; z-index:1001;">&times;</span>
+  <img class="modal-content" id="modalImage" style="margin:auto; display:block; max-width:90%; max-height:90%; position:relative; top:50%; transform:translateY(-50%);">
+</div>
+
+<script>
+// دالة لعرض الصورة في modal
+document.addEventListener('DOMContentLoaded', function() {
+  const modal = document.getElementById("imageModal");
+  const modalImg = document.getElementById("modalImage");
+  const closeBtn = document.querySelector(".close");
+  
+  // إضافة event listeners لجميع حاويات الصور
+  document.querySelectorAll('.image-container img').forEach(img => {
+    img.addEventListener('click', function() {
+      modal.style.display = "block";
+      modalImg.src = this.src;
+    });
+  });
+  
+  // إغلاق modal
+  closeBtn.addEventListener('click', function() {
+    modal.style.display = "none";
+  });
+  
+  // إغلاق modal بالنقر خارج الصورة
+  modal.addEventListener('click', function(e) {
+    if (e.target === modal) {
+      modal.style.display = "none";
+    }
+  });
+});
+
+// دالة طباعة الصورة
+function printImage(imgId) {
+  const img = document.getElementById(imgId);
+  const printWindow = window.open('', '_blank');
+  printWindow.document.write(`
+    <html>
+      <head>
+        <title>طباعة الصورة</title>
+        <style>
+          body { text-align:center; margin:0; padding:20px; }
+          img { max-width:100%; height:auto; }
+        </style>
+      </head>
+      <body>
+        <img src="${img.src}" />
+        <script>
+          window.onload = function() {
+            window.print();
+            setTimeout(function() { window.close(); }, 1000);
+          }
+        <\/script>
+      </body>
+    </html>
+  `);
+  printWindow.document.close();
+}
+</script>
+
+<style>
+.btn {
+  display: inline-block;
+  padding: 8px 16px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: all 0.3s ease;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-primary {
+  background: #007bff;
+  color: white;
+}
+
+.btn-secondary {
+  background: #6c757d;
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #0056b3;
+  transform: translateY(-2px);
+}
+
+.btn-secondary:hover {
+  background: #545b62;
+  transform: translateY(-2px);
+}
+
+.alert {
+  padding: 12px 16px;
+  border-radius: 6px;
+  margin: 10px 0;
+}
+
+.alert-info {
+  background: #d1ecf1;
+  color: #0c5460;
+  border: 1px solid #bee5eb;
+}
+
+.image-container img:hover {
+  transform: scale(1.05);
+}
+
+.modal {
+  animation: fadeIn 0.3s;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+</style>
+{% endblock %}

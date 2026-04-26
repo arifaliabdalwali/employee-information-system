@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>طباعة تقرير الموظفين</title>
+
+<style>
+body { font-family: Arial; direction: rtl; margin: 20px; }
+table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+table, th, td { border: 1px solid #000; }
+th, td { padding: 8px; text-align: center; }
+.print-btn {
+    padding: 10px 20px; background: #0a78d6; color: #fff;
+    border: none; cursor: pointer; margin-bottom: 20px;
+}
+@media print {
+    .print-btn { display: none; }
+}
+</style>
+</head>
+
+<body>
+
+<button class="print-btn" onclick="window.print()">طباعة</button>
+
+<h2 style="text-align:center;">تقرير بيانات الموظفين</h2>
+
+<table>
+<thead>
+<tr>
+    <th>اسم الموظف</th>
+    <th>الوظيفة</th>
+    <th>القسم</th>
+</tr>
+</thead>
+<tbody>
+{% for emp in employees %}
+<tr>
+    <td>{{ emp[0] }}</td>
+    <td>{{ emp[1] }}</td>
+    <td>{{ emp[2] }}</td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+
+</body>
+</html>

@@ -1,0 +1,742 @@
+{% extends "base.html" %}
+{% block title %}إضافة الإيفاد{% endblock %}
+
+{% block content %}
+<style>
+    :root {
+        --primary: #2c82ff;
+        --primary-light: #4d9eff;
+        --primary-dark: #1a6bff;
+        --accent: #00d4b4;
+        --light-bg: #f0f8ff;
+        --border-color: #d1e7ff;
+        --text-dark: #1a365d;
+        --text-light: #4a5568;
+    }
+
+    body {
+        background: linear-gradient(135deg, #2c82ff 0%, #1a6bff 100%);
+        min-height: 100vh;
+        padding: 20px;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Segoe UI Arabic', sans-serif;
+    }
+
+    .container {
+        max-width: 700px;
+        margin: 30px auto;
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        overflow: hidden;
+    }
+
+    .form-header {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+        color: white;
+        padding: 25px 30px;
+        text-align: center;
+    }
+
+    .form-header h2 {
+        margin: 0;
+        font-size: 24px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+    }
+
+    .form-body {
+        padding: 30px;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: var(--text-dark);
+        font-size: 15px;
+    }
+
+    .form-input, .form-textarea {
+        padding: 14px 16px;
+        border: 2px solid var(--border-color);
+        border-radius: 12px;
+        font-size: 16px;
+        transition: all 0.3s ease;
+        background: white;
+        color: var(--text-dark);
+    }
+
+    .form-input:focus, .form-textarea:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(44, 130, 255, 0.15);
+    }
+
+    .form-textarea {
+        resize: vertical;
+        min-height: 100px;
+        font-family: inherit;
+    }
+
+    .date-input-wrapper {
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+
+    .date-input-wrapper input {
+        width: 100%;
+        padding-left: 45px;
+    }
+
+    .calendar-icon {
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 20px;
+        color: var(--primary);
+        cursor: pointer;
+        z-index: 10;
+    }
+
+    /* منطقة رفع الملفات */
+    .file-input-wrapper {
+        position: relative;
+        display: block;
+    }
+
+    .custom-file-input {
+        display: block;
+        width: 100%;
+        padding: 14px 16px;
+        border: 2px solid var(--border-color);
+        border-radius: 12px;
+        background: var(--light-bg);
+        cursor: pointer;
+        text-align: center;
+        color: var(--text-light);
+        font-size: 16px;
+        transition: all 0.3s ease;
+        margin-bottom: 35px !important;
+    }
+
+    .custom-file-input:hover {
+        border-color: var(--primary);
+        background: rgba(44, 130, 255, 0.05);
+    }
+
+    .file-input {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        cursor: pointer;
+    }
+
+    .preview-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 20px !important;
+        min-height: 80px;
+    }
+
+    .preview-item {
+        position: relative;
+        width: 90px;
+        height: 70px;
+        overflow: hidden;
+        border-radius: 6px;
+    }
+
+    .preview-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 6px;
+    }
+
+    .file-preview {
+        width: 90px;
+        height: 70px;
+        background: var(--light-bg);
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        color: var(--primary);
+    }
+
+    .form-footer {
+        padding: 20px 30px;
+        background: #f8f9ff;
+        border-top: 1px solid var(--border-color);
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+    }
+
+    .btn {
+        padding: 12px 30px;
+        border-radius: 10px;
+        font-size: 16px;
+        font-weight: 500;
+        cursor: pointer;
+        border: none;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, var(--accent) 0%, #00b89a 100%);
+        color: white;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 212, 180, 0.3);
+    }
+
+    .btn-secondary {
+        background: white;
+        color: var(--text-dark);
+        border: 2px solid var(--border-color);
+    }
+
+    .btn-secondary:hover {
+        background: var(--light-bg);
+        border-color: var(--primary);
+        color: var(--primary);
+    }
+
+    /* Calendar Modal Styles */
+    .calendar-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.5);
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .calendar-container {
+        background: white;
+        border-radius: 20px;
+        padding: 25px;
+        width: 400px;
+        max-width: 90%;
+    }
+
+    .calendar-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        gap: 10px;
+    }
+
+    .calendar-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: var(--text-dark);
+        text-align: center;
+        flex: 1;
+    }
+
+    .calendar-nav {
+        display: flex;
+        gap: 10px;
+    }
+
+    .calendar-nav button {
+        background: var(--light-bg);
+        border: none;
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        font-size: 18px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .calendar-nav button:hover {
+        background: var(--primary);
+        color: white;
+    }
+
+    .calendar-selectors {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+        justify-content: center;
+    }
+
+    .calendar-select {
+        padding: 8px 15px;
+        border: 2px solid var(--border-color);
+        border-radius: 10px;
+        font-size: 14px;
+        font-weight: 500;
+        background: white;
+        color: var(--text-dark);
+        cursor: pointer;
+    }
+
+    .calendar-weekdays {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 5px;
+        margin-bottom: 10px;
+        text-align: center;
+        font-weight: 600;
+        color: var(--text-light);
+    }
+
+    .calendar-days {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 5px;
+    }
+
+    .calendar-day {
+        height: 45px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 10px;
+        cursor: pointer;
+        font-size: 14px;
+    }
+
+    .calendar-day:hover {
+        background: var(--light-bg);
+    }
+
+    .calendar-day.selected {
+        background: var(--primary);
+        color: white;
+    }
+
+    .calendar-day.today {
+        border: 2px solid var(--accent);
+    }
+
+    .calendar-day.other-month {
+        color: #ccc;
+    }
+
+    .calendar-actions {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 20px;
+    }
+
+    .calendar-actions button {
+        padding: 10px 20px;
+        border-radius: 10px;
+        border: none;
+        font-weight: 500;
+        cursor: pointer;
+    }
+
+    .calendar-actions .btn-today {
+        background: var(--light-bg);
+        color: var(--text-dark);
+    }
+
+    .calendar-actions .btn-close {
+        background: #ff4757;
+        color: white;
+    }
+</style>
+
+<div class="container" dir="rtl">
+    <div class="form-header">
+        <h2>
+            <span>✈️</span>
+            إضافة ايفاد جديد
+        </h2>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data" id="addDelegationForm">
+        <div class="form-body">
+            <div class="form-group">
+                <label class="form-label">رقم الكتاب</label>
+                <input type="text" name="book_number" required class="form-input" placeholder="أدخل رقم الكتاب">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">تاريخ الكتاب</label>
+                <div class="date-input-wrapper">
+                    <input type="text" id="book_date_display" readonly required class="form-input" placeholder="انقر لاختيار التاريخ" value="">
+                    <span class="calendar-icon" onclick="showCalendar('book')">📅</span>
+                    <input type="hidden" name="book_date" id="book_date_value" required value="">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">جهة الايفاد</label>
+                <input type="text" name="delegation_destination" required class="form-input" placeholder="أدخل جهة الايفاد">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">مدة الايفاد</label>
+                <input type="text" name="duration" required class="form-input" placeholder="أدخل مدة الايفاد">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">تاريخ الانفكاك</label>
+                <div class="date-input-wrapper">
+                    <input type="text" id="return_date_display" readonly required class="form-input" placeholder="انقر لاختيار التاريخ" value="">
+                    <span class="calendar-icon" onclick="showCalendar('return')">📅</span>
+                    <input type="hidden" name="return_date" id="return_date_value" required value="">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">ملاحظات</label>
+                <textarea name="notes" class="form-textarea" placeholder="ملاحظات إضافية (اختياري)"></textarea>
+            </div>
+
+            <!-- منطقة رفع الملفات -->
+            <div class="form-group">
+                <label class="form-label">رفع ملفات / صور</label>
+                <div class="file-input-wrapper">
+                    <div class="custom-file-input">📁  المرفقات</div>
+                    <input type="file" name="docs" id="fileInputDelegation" multiple accept="image/*,application/pdf" class="file-input">
+                    <div style="min-height: 40px; display: block;"></div>
+                    <div id="previewDelegation" class="preview-container"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-footer">
+            <button type="submit" class="btn btn-primary">
+                <span>💾</span>
+                حفظ
+            </button>
+            <a href="{{ url_for('index_delegation', emp_id=emp_id) }}" class="btn btn-secondary">
+                <span>✕</span>
+                إلغاء
+            </a>
+        </div>
+    </form>
+</div>
+
+<!-- Calendar Modal -->
+<div id="calendarModal" class="calendar-modal">
+    <div class="calendar-container">
+        <div class="calendar-header">
+            <div class="calendar-nav">
+                <button onclick="changeMonth(-1)">‹</button>
+            </div>
+            <div class="calendar-title" id="calendarMonthYear"></div>
+            <div class="calendar-nav">
+                <button onclick="changeMonth(1)">›</button>
+            </div>
+        </div>
+        
+        <div class="calendar-selectors">
+            <select id="yearSelect" class="calendar-select" onchange="changeYear(this.value)">
+                <!-- Years will be populated by JavaScript -->
+            </select>
+            <select id="monthSelect" class="calendar-select" onchange="changeMonthSelect(this.value)">
+                <!-- Months are fixed in Arabic -->
+            </select>
+        </div>
+        
+        <div class="calendar-weekdays">
+            <div>أحد</div>
+            <div>اثنين</div>
+            <div>ثلاثاء</div>
+            <div>أربعاء</div>
+            <div>خميس</div>
+            <div>جمعة</div>
+            <div>سبت</div>
+        </div>
+        
+        <div class="calendar-days" id="calendarDays"></div>
+        
+        <div class="calendar-actions">
+            <button class="btn-today" onclick="setToday()">اليوم</button>
+            <button class="btn-close" onclick="hideCalendar()">إغلاق</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // File Preview
+    const fileInputDelegation = document.getElementById('fileInputDelegation');
+    const previewDelegation = document.getElementById('previewDelegation');
+    const customFileInput = document.querySelector('.custom-file-input');
+    
+    fileInputDelegation.addEventListener('change', () => {
+        previewDelegation.innerHTML = '';
+        const files = fileInputDelegation.files;
+        
+        if (files.length > 0) {
+            customFileInput.textContent = `📁 تم اختيار ${files.length} ملف${files.length > 1 ? 'ات' : ''}`;
+        } else {
+            customFileInput.textContent = '📁 اختر المرفقات';
+        }
+        
+        Array.from(files).forEach(f => {
+            const item = document.createElement('div');
+            
+            if (f.type.startsWith('image/')) {
+                item.className = 'preview-item';
+                const img = document.createElement('img');
+                img.className = 'preview-image';
+                img.alt = f.name;
+                const reader = new FileReader();
+                reader.onload = e => img.src = e.target.result;
+                reader.readAsDataURL(f);
+                item.appendChild(img);
+            } else {
+                item.className = 'file-preview';
+                item.innerHTML = '📄';
+            }
+            
+            previewDelegation.appendChild(item);
+        });
+    });
+
+    // Calendar Functions
+    let currentDate = new Date();
+    let selectedDate = null;
+    let currentDateField = 'book'; // 'book' or 'return'
+
+    const monthNames = [
+        'يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو',
+        'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'
+    ];
+
+    function showCalendar(field) {
+        currentDateField = field;
+        document.getElementById('calendarModal').style.display = 'flex';
+        populateYearSelect();
+        populateMonthSelect();
+        
+        // Set current date based on the field being edited
+        const displayField = document.getElementById(`${field}_date_display`);
+        if (displayField.value) {
+            const dateParts = displayField.value.split('/');
+            if (dateParts.length === 3) {
+                currentDate = new Date(parseInt(dateParts[0]), parseInt(dateParts[1]) - 1, parseInt(dateParts[2]));
+            }
+        }
+        
+        renderCalendar();
+    }
+
+    function hideCalendar() {
+        document.getElementById('calendarModal').style.display = 'none';
+    }
+
+    function changeMonth(direction) {
+        currentDate.setMonth(currentDate.getMonth() + direction);
+        updateSelectorsFromCurrentDate();
+        renderCalendar();
+    }
+
+    function changeYear(year) {
+        currentDate.setFullYear(parseInt(year));
+        renderCalendar();
+    }
+
+    function changeMonthSelect(monthIndex) {
+        currentDate.setMonth(parseInt(monthIndex));
+        renderCalendar();
+    }
+
+    function populateYearSelect() {
+        const yearSelect = document.getElementById('yearSelect');
+        yearSelect.innerHTML = '';
+        
+        const currentYear = new Date().getFullYear();
+        for (let year = currentYear - 10; year <= currentYear + 10; year++) {
+            const option = document.createElement('option');
+            option.value = year;
+            option.textContent = year;
+            if (year === currentDate.getFullYear()) {
+                option.selected = true;
+            }
+            yearSelect.appendChild(option);
+        }
+    }
+
+    function populateMonthSelect() {
+        const monthSelect = document.getElementById('monthSelect');
+        monthSelect.innerHTML = '';
+        
+        monthNames.forEach((month, index) => {
+            const option = document.createElement('option');
+            option.value = index;
+            option.textContent = month;
+            if (index === currentDate.getMonth()) {
+                option.selected = true;
+            }
+            monthSelect.appendChild(option);
+        });
+    }
+
+    function updateSelectorsFromCurrentDate() {
+        document.getElementById('yearSelect').value = currentDate.getFullYear();
+        document.getElementById('monthSelect').value = currentDate.getMonth();
+    }
+
+    function renderCalendar() {
+        const year = currentDate.getFullYear();
+        const month = currentDate.getMonth();
+        
+        document.getElementById('calendarMonthYear').textContent = 
+            `${monthNames[month]} ${year}`;
+        
+        updateSelectorsFromCurrentDate();
+        
+        const firstDay = new Date(year, month, 1);
+        const lastDay = new Date(year, month + 1, 0);
+        const daysInMonth = lastDay.getDate();
+        const startingDay = firstDay.getDay();
+        
+        const calendarDays = document.getElementById('calendarDays');
+        calendarDays.innerHTML = '';
+        
+        for (let i = 0; i < startingDay; i++) {
+            const emptyDay = document.createElement('div');
+            emptyDay.className = 'calendar-day other-month';
+            calendarDays.appendChild(emptyDay);
+        }
+        
+        for (let day = 1; day <= daysInMonth; day++) {
+            const dayElement = document.createElement('div');
+            dayElement.className = 'calendar-day';
+            dayElement.textContent = day;
+            
+            const thisDate = new Date(year, month, day);
+            
+            const today = new Date();
+            if (thisDate.toDateString() === today.toDateString()) {
+                dayElement.classList.add('today');
+            }
+            
+            if (selectedDate && thisDate.toDateString() === selectedDate.toDateString()) {
+                dayElement.classList.add('selected');
+            }
+            
+            dayElement.onclick = () => selectDate(thisDate);
+            calendarDays.appendChild(dayElement);
+        }
+    }
+
+    function selectDate(date) {
+        selectedDate = date;
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        
+        const formattedDate = `${year}/${month}/${day}`;
+        
+        if (currentDateField === 'book') {
+            document.getElementById('book_date_display').value = formattedDate;
+            document.getElementById('book_date_value').value = formattedDate;
+        } else if (currentDateField === 'return') {
+            document.getElementById('return_date_display').value = formattedDate;
+            document.getElementById('return_date_value').value = formattedDate;
+        }
+        
+        hideCalendar();
+    }
+
+    function setToday() {
+        const today = new Date();
+        selectDate(today);
+        currentDate = new Date();
+        renderCalendar();
+    }
+
+    // Initialize dates
+    document.addEventListener('DOMContentLoaded', () => {
+        // Book date initialization
+        const bookDateDisplay = document.getElementById('book_date_display');
+        const bookDateValue = document.getElementById('book_date_value');
+        
+        if (!bookDateDisplay.value || bookDateDisplay.value.trim() === '') {
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = String(today.getMonth() + 1).padStart(2, '0');
+            const day = String(today.getDate()).padStart(2, '0');
+            
+            const formattedDate = `${year}/${month}/${day}`;
+            bookDateDisplay.value = formattedDate;
+            bookDateValue.value = formattedDate;
+        }
+        
+        // Return date initialization
+        const returnDateDisplay = document.getElementById('return_date_display');
+        const returnDateValue = document.getElementById('return_date_value');
+        
+        if (!returnDateDisplay.value || returnDateDisplay.value.trim() === '') {
+            // Set default return date to 7 days from today
+            const today = new Date();
+            const futureDate = new Date(today);
+            futureDate.setDate(today.getDate() + 7);
+            
+            const year = futureDate.getFullYear();
+            const month = String(futureDate.getMonth() + 1).padStart(2, '0');
+            const day = String(futureDate.getDate()).padStart(2, '0');
+            
+            const formattedDate = `${year}/${month}/${day}`;
+            returnDateDisplay.value = formattedDate;
+            returnDateValue.value = formattedDate;
+        }
+    });
+
+    // Drag and drop functionality
+    customFileInput.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        customFileInput.style.borderColor = 'var(--primary)';
+        customFileInput.style.backgroundColor = 'rgba(44, 130, 255, 0.1)';
+    });
+
+    customFileInput.addEventListener('dragleave', (e) => {
+        e.preventDefault();
+        customFileInput.style.borderColor = 'var(--border-color)';
+        customFileInput.style.backgroundColor = 'var(--light-bg)';
+    });
+
+    customFileInput.addEventListener('drop', (e) => {
+        e.preventDefault();
+        customFileInput.style.borderColor = 'var(--border-color)';
+        customFileInput.style.backgroundColor = 'var(--light-bg)';
+        
+        const files = e.dataTransfer.files;
+        fileInputDelegation.files = files;
+        
+        const event = new Event('change');
+        fileInputDelegation.dispatchEvent(event);
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,229 @@
+{% extends "base.html" %}
+{% block title %}عرض {{ document_type }} - {{ document.title or document.name }}{% endblock %}
+
+{% block content %}
+<div class="container" dir="rtl">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>📄 عرض {{ document_type }}</h1>
+        <div>
+            <a href="{{ url_for('search_documents') }}" class="btn btn-secondary">← العودة للبحث</a>
+            <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">الرئيسية</a>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">تفاصيل {{ document_type }}</h5>
+        </div>
+        <div class="card-body">
+            <!-- صورة الكتاب واسم الموظف في أعلى الصفحة -->
+            <div class="row mb-4">
+                <div class="col-md-3 text-center">
+                    {% set has_image = false %}
+                    {% for attachment in attachments %}
+                        {% if attachment.filename and attachment.filename.split('.')[-1].lower() in ['jpg', 'jpeg', 'png', 'gif', 'bmp'] %}
+                            {% set has_image = true %}
+                            <img src="{{ url_for('static', filename='documents/' + table_name + '/' + attachment.filename) }}" 
+                                 class="img-fluid rounded shadow" 
+                                 style="max-height: 200px;"
+                                 alt="صورة {{ document_type }}"
+                                 onerror="this.style.display='none'">
+                            <div class="mt-2">
+                                <small class="text-muted">صورة {{ document_type }}</small>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if not has_image %}
+                        <div class="text-center text-muted py-4">
+                            <i class="fas fa-file-image fa-3x mb-2"></i>
+                            <p>لا توجد صورة</p>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="col-md-9">
+                    {% if document.employee_id %}
+                    <div class="alert alert-info">
+                        <h6>
+                            <i class="fas fa-info-circle"></i>
+                            هذا المستند خاص بالموظف: 
+                            <strong>
+                                {% if employee_name %}
+                                    {{ employee_name }}
+                                {% else %}
+                                    موظف غير معروف
+                                {% endif %}
+                            </strong>
+                            {% if document.employee_id %}
+                            <a href="{{ url_for('view_employee', emp_id=document.employee_id) }}" 
+                               class="btn btn-sm btn-outline-primary float-start ms-3">
+                                <i class="fas fa-user"></i> عرض ملف الموظف
+                            </a>
+                            {% endif %}
+                        </h6>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-warning">
+                        <h6>
+                            <i class="fas fa-info-circle"></i>
+                            هذا المستند عام ولا يرتبط بموظف محدد
+                        </h6>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- عرض البيانات الأساسية -->
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <table class="table table-bordered">
+                        {% if document.book_number %}
+                        <tr>
+                            <th width="40%">رقم الكتاب:</th>
+                            <td>{{ document.book_number }}</td>
+                        </tr>
+                        {% endif %}
+                        {% if document.title %}
+                        <tr>
+                            <th>العنوان:</th>
+                            <td>{{ document.title }}</td>
+                        </tr>
+                        {% endif %}
+                        {% if document.name %}
+                        <tr>
+                            <th>الاسم:</th>
+                            <td>{{ document.name }}</td>
+                        </tr>
+                        {% endif %}
+                        {% if document.book_date %}
+                        <tr>
+                            <th>تاريخ الكتاب:</th>
+                            <td>{{ document.book_date }}</td>
+                        </tr>
+                        {% endif %}
+                    </table>
+                </div>
+                <div class="col-md-6">
+                    <table class="table table-bordered">
+                        {% if document.department %}
+                        <tr>
+                            <th width="40%">القسم:</th>
+                            <td>{{ document.department }}</td>
+                        </tr>
+                        {% endif %}
+                        {% if employee_name %}
+                        <tr>
+                            <th>اسم الموظف:</th>
+                            <td>
+                                {{ employee_name }}
+                                {% if document.employee_id %}
+                                <a href="{{ url_for('view_employee', emp_id=document.employee_id) }}" 
+                                   class="btn btn-sm btn-outline-primary ms-2">
+                                    <i class="fas fa-external-link-alt"></i>
+                                </a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endif %}
+                        {% if document.type %}
+                        <tr>
+                            <th>النوع:</th>
+                            <td>
+                                <span class="badge bg-info">{{ document.type }}</span>
+                            </td>
+                        </tr>
+                        {% endif %}
+                        {% if document.grade %}
+                        <tr>
+                            <th>الدرجة:</th>
+                            <td>{{ document.grade }}</td>
+                        </tr>
+                        {% endif %}
+                    </table>
+                </div>
+            </div>
+
+            <!-- عرض البيانات الإضافية -->
+            {% if document.description or document.notes %}
+            <div class="mb-4">
+                <h6 class="border-bottom pb-2">التفاصيل الإضافية:</h6>
+                {% if document.description %}
+                <div class="mb-3">
+                    <strong>الوصف:</strong>
+                    <div class="border p-3 bg-light rounded">
+                        {{ document.description }}
+                    </div>
+                </div>
+                {% endif %}
+                {% if document.notes %}
+                <div class="mb-3">
+                    <strong>الملاحظات:</strong>
+                    <div class="border p-3 bg-light rounded">
+                        {{ document.notes }}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+
+            <!-- عرض جميع البيانات -->
+            <div class="mb-4">
+                <h6 class="border-bottom pb-2">جميع البيانات:</h6>
+                <div class="table-responsive">
+                    <table class="table table-sm table-bordered">
+                        <tbody>
+                            {% for key, value in document.items() %}
+                            {% if value and key not in ['id'] %}
+                            <tr>
+                                <th width="30%" class="bg-light">{{ key }}</th>
+                                <td>
+                                    {% if value is string and (value.startswith('http') or value.startswith('/static/')) %}
+                                        <a href="{{ value }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-download"></i> تحميل الملف
+                                        </a>
+                                    {% else %}
+                                        {{ value }}
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endif %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- عرض المرفقات -->
+            {% if attachments %}
+            <div class="mt-4">
+                <h6 class="border-bottom pb-2">المرفقات:</h6>
+                <div class="row">
+                    {% for attachment in attachments %}
+                    <div class="col-md-3 mb-3">
+                        <div class="card">
+                            <div class="card-body text-center">
+                                {% if attachment.filename and attachment.filename.split('.')[-1].lower() in ['jpg', 'jpeg', 'png', 'gif', 'bmp'] %}
+                                    <img src="{{ url_for('static', filename='documents/' + table_name + '/' + attachment.filename) }}" 
+                                         class="img-fluid rounded mb-2" 
+                                         style="max-height: 80px;"
+                                         alt="صورة المرفق">
+                                    <h6 class="small">{{ attachment.filename }}</h6>
+                                {% else %}
+                                    <i class="fas fa-file fa-2x text-primary mb-2"></i>
+                                    <h6 class="small">{{ attachment.filename }}</h6>
+                                {% endif %}
+                                <a href="{{ url_for('static', filename='documents/' + table_name + '/' + attachment.filename) }}" 
+                                   target="_blank" class="btn btn-sm btn-primary mt-1">
+                                    <i class="fas fa-download"></i> تحميل
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

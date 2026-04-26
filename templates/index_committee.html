@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}لجان {{ employee['name'] }}{% endblock %}
+
+{% block content %}
+
+<div class="container" dir="rtl" style="max-width:1200px; margin:auto; padding:20px; background:#fff; border-radius:12px; box-shadow:0 4px 10px rgba(0,0,0,0.1);">
+  <h2 style="text-align:center; margin-bottom:20px;">قائمة اللجان الخاصة بـ {{ employee['name'] }}</h2>
+
+  <div style="text-align:center; margin-bottom:20px;">
+    <a href="{{ url_for('add_committee', emp_id=emp_id) }}" class="btn btn-info btn-sm" style="background:#2196F3; color:white; padding:8px 16px; border-radius:6px; text-decoration:none;">➕ إضافة لجنة</a>
+  </div>
+
+  <table style="width:100%; border-collapse:collapse; text-align:center;">
+    <thead style="background:#f5f5f5;">
+      <tr>
+        <th style="padding:10px; border:1px solid #ddd;">رقم الكتاب</th>
+        <th style="padding:10px; border:1px solid #ddd;">تاريخ الكتاب</th>
+        <th style="padding:10px; border:1px solid #ddd;">عنوان اللجنة</th>
+        <th style="padding:10px; border:1px solid #ddd;">الملاحظات</th>
+        <th style="padding:10px; border:1px solid #ddd;">إجراءات</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for committee in committees %}
+      <tr>
+        <td style="padding:8px; border:1px solid #ddd;">{{ committee['book_number'] }}</td>
+        <td style="padding:8px; border:1px solid #ddd;">{{ committee['book_date'] }}</td>
+        <td style="padding:8px; border:1px solid #ddd;">{{ committee['committee_title'] }}</td>
+        <td style="padding:8px; border:1px solid #ddd;">{{ committee['notes'] if committee['notes'] else '-' }}</td>
+        <td style="padding:8px; border:1px solid #ddd;">
+          <a href="{{ url_for('view_committee', committee_id=committee['id'], emp_id=emp_id) }}" class="btn btn-info btn-sm" style="background:#03A9F4; color:white; padding:4px 10px; border-radius:4px; text-decoration:none;">👁 عرض</a>
+          <a href="{{ url_for('edit_committee', committee_id=committee['id'], emp_id=emp_id) }}" class="btn btn-warning btn-sm" style="background:#FFC107; color:black; padding:4px 10px; border-radius:4px; text-decoration:none;">✏ تعديل</a>
+          <a href="{{ url_for('delete_committee', committee_id=committee['id'], emp_id=emp_id) }}" class="btn btn-danger btn-sm" style="background:#f44336; color:white; padding:4px 10px; border-radius:4px; text-decoration:none;" onclick="return confirm('هل أنت متأكد من الحذف؟')">🗑 حذف</a>
+        </td>
+      </tr>
+      {% else %}
+      <tr>
+        <td colspan="5" style="padding:10px; border:1px solid #ddd; color:#888;">لا توجد لجان مسجلة حالياً</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <div style="text-align:center; margin-top:20px;">
+    <a href="{{ url_for('view_employee', emp_id=employee['id']) }}" class="btn btn-info btn-sm" style="background:#607D8B; color:white; padding:8px 16px; border-radius:6px; text-decoration:none;">⬅ عودة للموظف</a>
+  </div>
+</div>
+
+{% endblock %}

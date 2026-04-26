@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% block title %}عرض موظف{% endblock %}
+
+{% block content %}
+<div class="container" dir="rtl" style="max-width:1200px; margin:auto; padding:20px; font-family:sans-serif;">
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: start;">
+    
+    <!-- العمود الأيسر: معلومات الموظف -->
+    <div style="background:#ffffff; border-radius:12px; box-shadow:0 6px 15px rgba(0,0,0,0.1); padding:24px;">
+      <h2 style="text-align:center; color:#222; margin-bottom:24px;">{{ employee['name'] }}</h2>
+
+      <div style="display: flex; flex-direction: column; gap: 16px;">
+        <div><strong>الشعبة:</strong> {{ employee['dept'] }}</div>
+        <div><strong>الشهادة:</strong> {{ employee['certificate'] }}</div>
+        <div><strong>الجنس:</strong> {{ employee['gender'] }}</div>
+        <div><strong>المنصب:</strong> {{ employee['job'] }}</div>
+        <div><strong>العنوان الوظيفي:</strong> {{ employee['job_title'] }}</div>
+        <div><strong>الدرجة:</strong> {{ employee['degree'] }}</div>
+        <div><strong> المرحلة:</strong> {{ employee['stage'] }}</div>
+        <div><strong>العنوان:</strong> {{ employee['address'] }}</div>
+        <div><strong>الهاتف:</strong> {{ employee['phone'] }}</div>
+        <div><strong>الملاحظات:</strong> {{ employee['notes'] or "—" }}</div>
+      </div>
+    </div>
+
+    <!-- العمود الأيمن: مستمسكات الموظف -->
+    <div style="background:#ffffff; border-radius:12px; box-shadow:0 6px 15px rgba(0,0,0,0.1); padding:24px;">
+      <h3 style="text-align:center; margin-bottom:20px; color:#555;">📂 مستمسكات الموظف</h3>
+      
+      {% if docs %}
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px;">
+        {% for doc in docs %}
+          {% set ext = doc['filename'].split('.')[-1].lower() %}
+          <div style="position:relative; border-radius:8px; overflow:hidden; box-shadow:0 2px 6px rgba(0,0,0,0.15); text-align:center;">
+            {% if ext in ['jpg','jpeg','png','gif','webp'] %}
+              <div class="image-container" data-image-src="{{ url_for('static', filename='documents/employees/' ~ doc['filename']) }}">
+                <img id="img_{{ doc.id }}" src="{{ url_for('static', filename='documents/employees/' ~ doc['filename']) }}" 
+                style="width:100%; height:80px; object-fit:cover;"
+                alt="{{ doc['filename'] }}"
+                title="انقر لعرض الصورة بتكبير">
+              </div>
+              <br>
+              <button type="button" class="btn btn-primary btn-sm" style="margin-top:4px; font-size:10px; padding:2px 6px;" onclick="printImage('img_{{ doc.id }}')">🖨️ طباعة</button>
+            {% else %}
+              <a href="{{ url_for('static', filename='documents/employees/' ~ doc['filename']) }}" target="_blank" class="d-block">
+                <div style="width:100%; height:80px; display:flex; align-items:center; justify-content:center; background:#f0f0f0; font-size:12px; cursor:pointer;">
+                  <i class="fas fa-file-pdf text-danger"></i>
+                  <small style="margin-right:4px;">{{ doc['filename'] }}</small>
+                </div>
+              </a>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+      {% else %}
+        <p style="text-align:center; color:#666;">لا توجد مستمسكات</p>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- أزرار التحكم -->
+  <div style="margin-top:24px; display:flex; flex-wrap:wrap; gap:12px; justify-content:center;">
+   
+    <a href="{{ url_for('index') }}">
+    <button style="padding:10px 22px; background:#2196F3; color:white; border:none; border-radius:6px; cursor:pointer;">🏠 الرئيسية</button>
+    </a>
+    <a href="{{ url_for('edit_employee', emp_id=employee['id']) }}">
+      <button style="padding:10px 22px; background:#4CAF50; color:white; border:none; border-radius:6px; cursor:pointer;">✏️ تعديل</button>
+    </a>
+    <!-- الصفحات التابعة -->
+    <a href="{{ url_for('index_book', emp_id=employee['id']) }}">
+      <button style="padding:10px 22px; background:#FF9800; color:white; border:none; border-radius:6px; cursor:pointer;">📘 كتب الشكر</button>
+    </a>
+    <a href="{{ url_for('index_course', emp_id=employee['id']) }}">
+      <button style="padding:10px 22px; background:#9C27B0; color:white; border:none; border-radius:6px; cursor:pointer;">🎓 الدورات</button>
+    </a>
+    <a href="{{ url_for('index_punishment', emp_id=employee['id']) }}">
+      <button style="padding:10px 22px; background:#f44336; color:white; border:none; border-radius:6px; cursor:pointer;">⚠️ العقوبات</button>
+    </a>
+    <a href="{{ url_for('index_vacation', emp_id=employee['id']) }}">
+      <button style="padding:10px 22px; background:#3F51B5; color:white; border:none; border-radius:6px; cursor:pointer;">🏖️ الإجازات</button>
+    </a>
+    <a href="{{ url_for('index_delegation', emp_id=employee['id']) }}">
+      <button style="padding:10px 22px; background:#009688; color:white; border:none; border-radius:6px; cursor:pointer;">✈️ الإيفادات</button>
+    </a>
+    <a href="{{ url_for('index_allowance', emp_id=employee['id']) }}">
+      <button style="padding:10px 22px; background:#8BC34A; color:white; border:none; border-radius:6px; cursor:pointer;">💰 العلاوات</button>
+    </a>
+    <a href="{{ url_for('index_promotion', emp_id=employee['id']) }}">
+      <button style="padding:10px 22px; background:#795548; color:white; border:none; border-radius:6px; cursor:pointer;">⬆️ الترفيعات</button>
+    </a>
+    <a href="{{ url_for('index_committee', emp_id=employee['id']) }}">
+      <button style="padding:10px 22px; background:#607D8B; color:white; border:none; border-radius:6px; cursor:pointer;">👥 اللجان</button>
+    </a>
+    <a href="{{ url_for('index_copybook', emp_id=employee['id']) }}">
+  <button style="padding:10px 22px; background:#FF9800; color:white; border:none; border-radius:6px; cursor:pointer;">📋 بريد متفرق </button>
+</a>
+  </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,325 @@
+{% extends "base.html" %}
+{% block title %}إضافة موظف{% endblock %}
+
+{% block content %}
+<div class="container" dir="rtl">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>➕ إضافة موظف جديد</h1>
+    <a href="{{ url_for('index') }}" class="btn btn-secondary">← العودة</a>
+  </div>
+
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      <div class="alert alert-danger">
+        {% for message in messages %}
+          {{ message }}
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <div class="card">
+    <div class="card-body">
+      <form method="POST" enctype="multipart/form-data" id="employeeForm">
+        <div class="row">
+          <div class="col-md-6">
+            <div class="mb-3">
+              <label for="name" class="form-label">الاسم الكامل *</label>
+              <input type="text" class="form-control" id="name" name="name" required 
+                     oninput="checkEmployeeExists()">
+              <div class="form-text text-danger" id="nameExistsMessage" style="display: none;">
+                ⚠️ هذا الموظف مسجل مسبقاً في النظام
+              </div>
+            </div>
+            
+           <div class="mb-3">
+  <label for="dept" class="form-label">الشعبة *</label>
+  <select class="form-select" id="dept" name="dept" required>
+    <option value="">اختر الشعبة</option>
+      <option value="مدير القسم">مدير القسم</option>
+    <option value="نظم المعلومات">نظم المعلومات</option>
+    <option value="الشبكات">الشبكات</option>
+    <option value="الصيانة">الصيانة</option>
+    <option value="الحكومة الإلكترونية">الحكومة الإلكترونية</option>
+    <option value="تصميم المواقع">تصميم المواقع</option>
+    <option value="الذكاء الاصطناعي">الذكاء الاصطناعي</option>
+    <option value="الادارية">الادارية</option>
+  </select>
+</div>
+            
+            <div class="mb-3">
+              <label for="certificate" class="form-label">الشهادة*</label>
+              <select class="form-select" id="certificate" name="certificate" required>
+                <option value="">اختر الشهادة</option>
+                <option value="يقرأويكتب">يقرأويكتب</option>
+                <option value="ابتدائي">ابتدائي</option>
+                <option value="متوسطة">متوسطة</option>
+                <option value="اعدادي">اعدادي</option>
+                <option value="دبلوم">دبلوم</option>
+                <option value="بكالوريوس">بكالوريوس</option>
+                <option value="دبلوم عالي">دبلوم عالي</option>
+                <option value="ماجستير">ماجستير</option>
+                <option value="دكتوراه">دكتوراه</option>
+              </select>
+            </div>
+            
+            <div class="mb-3">
+              <label class="form-label">الجنس *</label>
+              <div>
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio" name="gender" id="male" value="ذكر" required>
+                  <label class="form-check-label" for="male">ذكر</label>
+                </div>
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio" name="gender" id="female" value="انثى" required>
+                  <label class="form-check-label" for="female">انثى</label>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="col-md-6">
+            <div class="mb-3">
+              <label for="job" class="form-label">المنصب*</label>
+              <select class="form-select" id="job" name="job" required>
+                 <option value="">اختر المنصب</option>
+                <option value="مدير قسم">مدير القسم</option>
+                 <option value="معاون مدير قسم">معاون مدير قسم</option>
+                <option value="مسؤول شعبة">مسؤول شعبة</option>
+                <option value="موظف">موظف</option>
+              </select>
+            </div>
+            
+      
+
+           
+           <div class="mb-3">
+              <label for="job_title" class="form-label">العنوان الوظيفي*</label>
+              <select class="form-select" id="job_title" name="job_title" required>
+                  <option value="">اختر العنوان الوظيفي</option>
+                  <option value="ملاحظ">ملاحظ</option>
+                  <option value="معاون ملاحظ">معاون ملاحظ</option>
+                  <option value="معاون رئيس ملاحظين">معاون رئيس ملاحظين</option>
+                  <option value="رئيس ملاحظين">رئيس ملاحظين</option>
+                  <option value="معاون مدير">معاون مدير</option>
+                  <option value="مدير">مدير</option>
+                  <option value="مبرمج">مبرمج</option>
+                  <option value="رئيس مبرمجين">رئيس مبرمجين</option>
+                  <option value="مبرمج اقدم">مبرمج اقدم</option>
+                  <option value=" معاون مبرمج">معاون مبرمج </option>
+                  <option value=" معاون رئيس مبرمجين">معاون رئيس مبرمجين </option>
+                  <option value="رئيس مبرمجين اقدم"> رئيس مبرمجين اقدم</option>
+                  <option value="رئيس مبرمجين  اقدم اول">رئيس مبرمجين اقدم اول</option>
+                  <option value="رئيس مبرمجين">رئيس مبرمجين</option>
+                  <option value="مهندس">مهندس</option>
+                  <option value="معاون مهندس">معاون مهندس</option>
+                  <option value="مهندس اقدم">مهندس اقدم</option>
+                  <option value="معاون رئيس مهندسين">معاون رئيس مهندسين</option>
+                  <option value="رئيس مهندسين">رئيس مهندسين</option>
+                  <option value="رئيس مهندسين اقدم">رئيس مهندسين اقدم</option>
+                  <option value="رئيس مهندسين اقدم اول">رئيس مهندسين اقدم اول</option>
+                  <option value="قانوني ">قانوني </option>
+                  <option value="معاون قانوني ">معاون قانوني </option>
+                  <option value=" مشاور قانوني مساعد">مشاور  قانوني مساعد </option>
+                  <option value="مشاور قانوني">مشاور قانوني </option>
+                  <option value=" مشاور قانوني اقدم">مشاور قانوني اقدم</option>
+                  <option value="مستشار قانوني مساعد">مستشار قانوني مساعد</option>
+                  <option value="مستشار قانوني">مستشار قانوني</option>
+                  <option value="معاون رئيس بايلوجيين ">معاون رئيس بايلوجيين </option>
+                  <option value=" رئيس بايلوجيين">رئيس بايلوجيين </option>
+                  <option value=" رئيس بايلوجيين اقدم"> رئيس بايلوجيين اقدم</option>
+                  <option value="رئيس بايلوجيين اقدم اول ">رئيس بايلوجيين اقدم اول </option>
+                  <option value=" رسام اقدم"> رسام اقدم</option>
+                  <option value="رسام اقدم اول ">رسام اقدم اول </option>
+                  <option value="معاون رئيس مترجمين ">معاون رئيس مترجمين </option>
+                  <option value="رئيس مترجمين ">رئيس مترجمين </option>
+                  <option value="رئيس مترجمين اقدم ">رئيس مترجمين اقدم </option>
+                  <option value="رئيس مترجمين اقدم اول ">رئيس مترجمين اقدم اول </option>
+                  <option value=" مدرس اقدم">مدرس اقدم </option>
+                  <option value="مدرس اقدم اول ">مدرس اقدم اول </option>
+              </select> 
+            </div>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const selectMenu = document.getElementById('job_title');
+        
+        // 1. جلب العناوين المخزنة في المتصفح
+        let savedJobs = JSON.parse(localStorage.getItem('my_custom_jobs')) || [];
+
+        // 2. إضافتها كخيارات جديدة داخل الكومبو بوكس
+        savedJobs.forEach(function(job) {
+            const option = document.createElement('option');
+            option.value = job;
+            option.text = job;
+            selectMenu.add(option);
+        });
+        
+        console.log("تم تحديث الكومبو بالعناوين الإضافية من المتصفح");
+    });
+</script>
+
+            <div class="mb-3">
+              <label for="degree" class="form-label">الدرجة*</label>
+              <select class="form-select" id="degree" name="degree" required>
+                <option value="">اختر الدرجة</option>
+                {% for i in range(1, 11) %}
+                  <option value="{{ i }}">{{ i }}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label for="stage" class="form-label">المرحلة*</label>
+              <select class="form-select" id="stage" name="stage" required>
+                <option value="">اختر المرحلة</option>
+                {% for i in range(1, 12) %}
+                  <option value="{{ i }}">{{ i }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            
+            <div class="mb-3">
+              <label for="phone" class="form-label">الهاتف</label>
+              <input type="tel" class="form-control" id="phone" name="phone">
+            </div>
+          </div>
+        </div>
+        
+        <div class="mb-3">
+          <label for="address" class="form-label">عنوان السكن</label>
+          <textarea class="form-control" id="address" name="address" rows="2"></textarea>
+        </div>
+        
+        <div class="mb-3">
+          <label for="notes" class="form-label">الملاحظات</label>
+          <textarea class="form-control" id="notes" name="notes" rows="3"></textarea>
+        </div>
+         
+        <div class="mb-3">
+          <label for="docs" class="form-label">رفع المستمسكات </label>
+          <input type="file" class="form-control" id="docs" name="docs" multiple>
+        </div>
+      
+        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+          <button type="submit" class="btn btn-primary" id="submitBtn">حفظ </button>
+          <a href="{{ url_for('index') }}" class="btn btn-secondary">إلغاء</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    document.getElementById('resetFilters')?.addEventListener('click', function () {
+        window.location.href = "{{ url_for('all_employees') }}";
+    });
+
+    document.querySelectorAll('.main-checkbox').forEach(main => {
+        main.addEventListener('change', function () {
+            const options = document.getElementById(this.name.replace('search_', '') + 'Options');
+            if (!options) return;
+
+            if (this.checked) {
+                options.classList.remove('d-none');
+            } else {
+                options.classList.add('d-none');
+                options.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+            }
+        });
+    });
+
+    document.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+        cb.addEventListener('change', () => {
+            setTimeout(() => document.getElementById('searchForm').submit(), 300);
+        });
+    });
+
+    function getPriorityByOrder(text, orderList) {
+        if (!text) return 999;
+
+        for (let i = 0; i < orderList.length; i++) {
+            if (text.includes(orderList[i])) {
+                return i;
+            }
+        }
+        return 999;
+    }
+
+    function autoSortTable() {
+        const tbody = document.querySelector('tbody');
+        if (!tbody) return;
+
+        const rows = Array.from(tbody.querySelectorAll('tr'));
+        if (rows.length < 2) return;
+
+        const deptOrder = Array.from(
+            document.querySelectorAll('#deptOptions input[type="checkbox"]:checked')
+        ).map(cb => cb.value);
+
+        const jobOrder = Array.from(
+            document.querySelectorAll('#jobOptions input[type="checkbox"]:checked')
+        ).map(cb => cb.value);
+
+        const nameCol = 0;
+        const deptCol = 1;
+        const jobCol  = 2;
+
+        rows.sort((a, b) => {
+            const deptA = a.cells[deptCol]?.textContent.trim() || '';
+            const deptB = b.cells[deptCol]?.textContent.trim() || '';
+
+            const jobA  = a.cells[jobCol]?.textContent.trim() || '';
+            const jobB  = b.cells[jobCol]?.textContent.trim() || '';
+
+            const deptPriorityA = getPriorityByOrder(deptA, deptOrder);
+            const deptPriorityB = getPriorityByOrder(deptB, deptOrder);
+
+            if (deptPriorityA !== deptPriorityB) {
+                return deptPriorityA - deptPriorityB;
+            }
+
+            const jobPriorityA = getPriorityByOrder(jobA, jobOrder);
+            const jobPriorityB = getPriorityByOrder(jobB, jobOrder);
+
+            if (jobPriorityA !== jobPriorityB) {
+                return jobPriorityA - jobPriorityB;
+            }
+
+            const nameA = a.cells[nameCol]?.textContent.trim() || '';
+            const nameB = b.cells[nameCol]?.textContent.trim() || '';
+            return nameA.localeCompare(nameB, 'ar');
+        });
+
+        tbody.innerHTML = '';
+        rows.forEach(r => tbody.appendChild(r));
+    }
+
+    setTimeout(autoSortTable, 100);
+    window.addEventListener('beforeprint', autoSortTable);
+});
+</script>
+
+<style>
+
+/* ✔ إجبار كل القوائم المنسدلة أن تفتح للأسفل */
+select.form-select {
+  transform-origin: top center !important;
+}
+
+.form-control:invalid {
+  border-color: #dc3545;
+}
+
+.form-control:valid {
+  border-color: #198754;
+}
+
+#submitBtn:disabled {
+  background-color: #6c757d;
+  border-color: #6c757d;
+  cursor: not-allowed;
+}
+</style>
+
+{% endblock %}

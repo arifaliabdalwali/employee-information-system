@@ -1,0 +1,370 @@
+{% extends "base.html" %}
+{% block title %}تعديل موظف{% endblock %}
+
+{% block content %}
+<div class="container" dir="rtl">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0">✏️ تعديل موظف</h1>
+    <a href="{{ url_for('view_employee', emp_id=employee['id']) }}" class="btn btn-outline-secondary">
+      <i class="fas fa-arrow-right"></i> العودة
+    </a>
+  </div>
+
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <form method="POST" enctype="multipart/form-data" id="editForm">
+        <div class="row">
+          <!-- العمود الأول -->
+          <div class="col-md-6">
+            <div class="mb-3">
+              <label for="name" class="form-label">الاسم الكامل *</label>
+              <input type="text" class="form-control" id="name" name="name" value="{{ employee['name'] }}" required>
+            </div>
+
+          <div class="mb-3">
+  <label for="dept" class="form-label">الشعبة *</label>
+  <select class="form-select" id="dept" name="dept" required>
+    <option value="">اختر الشعبة</option>
+    
+    <option value="مدير القسم" {% if employee['dept'] == 'مدير القسم' %}selected{% endif %}>مدير القسم</option>
+    <option value="نظم المعلومات" {% if employee['dept'] == 'نظم المعلومات' %}selected{% endif %}>نظم المعلومات</option>
+    <option value="الشبكات" {% if employee['dept'] == 'الشبكات' %}selected{% endif %}>الشبكات</option>
+    <option value="الصيانة" {% if employee['dept'] == 'الصيانة' %}selected{% endif %}>الصيانة</option>
+    <option value="الحكومة الإلكترونية" {% if employee['dept'] == 'الحكومة الإلكترونية' %}selected{% endif %}>الحكومة الإلكترونية</option>
+    <option value="تصميم المواقع" {% if employee['dept'] == 'تصميم المواقع' %}selected{% endif %}>تصميم المواقع</option>
+    <option value="الذكاء الاصطناعي" {% if employee['dept'] == 'الذكاء الاصطناعي' %}selected{% endif %}>الذكاء الاصطناعي</option>
+    <option value="الادارية" {% if employee['dept'] == 'الادارية' %}selected{% endif %}>الادارية</option>
+    
+  </select>
+</div>
+
+            <div class="mb-3">
+              <label for="certificate" class="form-label">الشهادة *</label>
+              <select class="form-select" id="certificate" name="certificate" required>
+                <option value="يقرأويكتب" {% if employee['certificate']=='يقرأويكتب' %}selected{% endif %}>يقرأويكتب</option>
+                <option value="ابتدائي" {% if employee['certificate']=='ابتدائي' %}selected{% endif %}>ابتدائي</option>
+                <option value="متوسطة" {% if employee['certificate']=='متوسطة' %}selected{% endif %}>متوسطة</option>
+                <option value="اعدادي" {% if employee['certificate']=='اعدادي' %}selected{% endif %}>اعدادي</option>
+                <option value="دبلوم" {% if employee['certificate']=='دبلوم' %}selected{% endif %}>دبلوم</option>
+                <option value="بكالوريوس" {% if employee['certificate']=='بكالوريوس' %}selected{% endif %}>بكالوريوس</option>
+                <option value="دبلوم عالي" {% if employee['certificate']=='دبلوم عالي' %}selected{% endif %}>دبلوم عالي</option>
+                <option value="ماجستير" {% if employee['certificate']=='ماجستير' %}selected{% endif %}>ماجستير</option>
+                <option value="دكتوراه" {% if employee['certificate']=='دكتوراه' %}selected{% endif %}>دكتوراه</option>
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label for="gender" class="form-label">الجنس *</label>
+              <select class="form-select" id="gender" name="gender" required>
+                <option value="ذكر" {% if employee['gender']=='ذكر' %}selected{% endif %}>ذكر</option>
+                <option value="انثى" {% if employee['gender']=='انثى' %}selected{% endif %}>انثى</option>
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label for="job" class="form-label">المنصب *</label>
+              <select class="form-select" id="job" name="job" required>
+                <option value="مدير قسم" {% if employee['job']=='مدير القسم' %}selected{% endif %}>مدير القسم</option>
+                <option value="معاون مدير قسم " {% if employee['job']=='معاون مدير قسم' %}selected{% endif %}>معاون مدير قسم</option>
+                <option value="مسؤول شعبة" {% if employee['job']=='مسؤول شعبة' %}selected{% endif %}>مسؤول شعبة</option>
+                <option value="موظف" {% if employee['job']=='موظف' %}selected{% endif %}>موظف</option>
+              </select>
+            </div>
+          </div>
+
+        
+        <div class="mb-3">
+    <label for="job_title" class="form-label">العنوان الوظيفي*</label>
+    <select class="form-select" id="job_title" name="job_title" required>
+        <option value="">اختر العنوان الوظيفي</option>
+
+        <option value="ملاحظ" {% if employee and employee['job_title']=='ملاحظ' %}selected{% endif %}>ملاحظ</option>
+        <option value="معاون ملاحظ" {% if employee and employee['job_title']=='معاون ملاحظ' %}selected{% endif %}>معاون ملاحظ</option>
+        <option value="معاون رئيس ملاحظين" {% if employee and employee['job_title']=='معاون رئيس ملاحظين' %}selected{% endif %}>معاون رئيس ملاحظين</option>
+        <option value="رئيس ملاحظين" {% if employee and employee['job_title']=='رئيس ملاحظين' %}selected{% endif %}>رئيس ملاحظين</option>
+        <option value="معاون مدير" {% if employee and employee['job_title']=='معاون مدير' %}selected{% endif %}>معاون مدير</option>
+        <option value="مدير" {% if employee and employee['job_title']=='مدير' %}selected{% endif %}>مدير</option>
+
+        <option value="مبرمج" {% if employee and employee['job_title']=='مبرمج' %}selected{% endif %}>مبرمج</option>
+        <option value="رئيس مبرمجين" {% if employee and employee['job_title']=='رئيس مبرمجين' %}selected{% endif %}>رئيس مبرمجين</option>
+        <option value="مبرمج اقدم" {% if employee and employee['job_title']=='مبرمج اقدم' %}selected{% endif %}>مبرمج اقدم</option>
+        <option value="معاون مبرمج" {% if employee and employee['job_title']=='معاون مبرمج' %}selected{% endif %}>معاون مبرمج</option>
+        <option value="معاون رئيس مبرمجين" {% if employee and employee['job_title']=='معاون رئيس مبرمجين' %}selected{% endif %}>معاون رئيس مبرمجين</option>
+        <option value="رئيس مبرمجين اقدم" {% if employee and employee['job_title']=='رئيس مبرمجين اقدم' %}selected{% endif %}>رئيس مبرمجين اقدم</option>
+        <option value="رئيس مبرمجين اقدم اول" {% if employee and employee['job_title']=='رئيس مبرمجين اقدم اول' %}selected{% endif %}>رئيس مبرمجين اقدم اول</option>
+
+        <option value="مهندس" {% if employee and employee['job_title']=='مهندس' %}selected{% endif %}>مهندس</option>
+        <option value="معاون مهندس" {% if employee and employee['job_title']=='معاون مهندس' %}selected{% endif %}>معاون مهندس</option>
+        <option value="مهندس اقدم" {% if employee and employee['job_title']=='مهندس اقدم' %}selected{% endif %}>مهندس اقدم</option>
+        <option value="معاون رئيس مهندسين" {% if employee and employee['job_title']=='معاون رئيس مهندسين' %}selected{% endif %}>معاون رئيس مهندسين</option>
+        <option value="رئيس مهندسين" {% if employee and employee['job_title']=='رئيس مهندسين' %}selected{% endif %}>رئيس مهندسين</option>
+        <option value="رئيس مهندسين اقدم" {% if employee and employee['job_title']=='رئيس مهندسين اقدم' %}selected{% endif %}>رئيس مهندسين اقدم</option>
+        <option value="رئيس مهندسين اقدم اول" {% if employee and employee['job_title']=='رئيس مهندسين اقدم اول' %}selected{% endif %}>رئيس مهندسين اقدم اول</option>
+
+        <option value="قانوني" {% if employee and employee['job_title']=='قانوني' %}selected{% endif %}>قانوني</option>
+        <option value="معاون قانوني" {% if employee and employee['job_title']=='معاون قانوني' %}selected{% endif %}>معاون قانوني</option>
+        <option value="مشاور قانوني مساعد" {% if employee and employee['job_title']=='مشاور قانوني مساعد' %}selected{% endif %}>مشاور قانوني مساعد</option>
+        <option value="مشاور قانوني" {% if employee and employee['job_title']=='مشاور قانوني' %}selected{% endif %}>مشاور قانوني</option>
+        <option value="مشاور قانوني اقدم" {% if employee and employee['job_title']=='مشاور قانوني اقدم' %}selected{% endif %}>مشاور قانوني اقدم</option>
+        <option value="مستشار قانوني مساعد" {% if employee and employee['job_title']=='مستشار قانوني مساعد' %}selected{% endif %}>مستشار قانوني مساعد</option>
+        <option value="مستشار قانوني" {% if employee and employee['job_title']=='مستشار قانوني' %}selected{% endif %}>مستشار قانوني</option>
+
+        <option value="معاون رئيس بايلوجيين" {% if employee and employee['job_title']=='معاون رئيس بايلوجيين' %}selected{% endif %}>معاون رئيس بايلوجيين</option>
+        <option value="رئيس بايلوجيين" {% if employee and employee['job_title']=='رئيس بايلوجيين' %}selected{% endif %}>رئيس بايلوجيين</option>
+        <option value="رئيس بايلوجيين اقدم" {% if employee and employee['job_title']=='رئيس بايلوجيين اقدم' %}selected{% endif %}>رئيس بايلوجيين اقدم</option>
+        <option value="رئيس بايلوجيين اقدم اول" {% if employee and employee['job_title']=='رئيس بايلوجيين اقدم اول' %}selected{% endif %}>رئيس بايلوجيين اقدم اول</option>
+
+        <option value="رسام اقدم" {% if employee and employee['job_title']=='رسام اقدم' %}selected{% endif %}>رسام اقدم</option>
+        <option value="رسام اقدم اول" {% if employee and employee['job_title']=='رسام اقدم اول' %}selected{% endif %}>رسام اقدم اول</option>
+
+        <option value="معاون رئيس مترجمين" {% if employee and employee['job_title']=='معاون رئيس مترجمين' %}selected{% endif %}>معاون رئيس مترجمين</option>
+        <option value="رئيس مترجمين" {% if employee and employee['job_title']=='رئيس مترجمين' %}selected{% endif %}>رئيس مترجمين</option>
+        <option value="رئيس مترجمين اقدم" {% if employee and employee['job_title']=='رئيس مترجمين اقدم' %}selected{% endif %}>رئيس مترجمين اقدم</option>
+        <option value="رئيس مترجمين اقدم اول" {% if employee and employee['job_title']=='رئيس مترجمين اقدم اول' %}selected{% endif %}>رئيس مترجمين اقدم اول</option>
+
+        <option value="مدرس اقدم" {% if employee and employee['job_title']=='مدرس اقدم' %}selected{% endif %}>مدرس اقدم</option>
+        <option value="مدرس اقدم اول" {% if employee and employee['job_title']=='مدرس اقدم اول' %}selected{% endif %}>مدرس اقدم اول</option>
+
+    </select>
+  </div>
+ 
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const selectMenu = document.getElementById('job_title');
+        
+        // 1. جلب العناوين المخزنة من ذاكرة المتصفح
+        let savedJobs = JSON.parse(localStorage.getItem('my_custom_jobs')) || [];
+        
+        // القيمة الحالية للموظف (من السيرفر) إن وجدت
+        // نقوم بجلبها من خاصية data أو نتركها فارغة
+        const currentUserJob = "{{ employee['job_title'] if employee else '' }}";
+
+        // 2. إضافة العناوين الجديدة إلى الكومبو بوكس
+        savedJobs.forEach(function(job) {
+            // نتحقق أولاً أن العنوان غير موجود بالفعل في القائمة الثابتة لتجنب التكرار
+            let exists = Array.from(selectMenu.options).some(option => option.value === job);
+            
+            if (!exists) {
+                const option = document.createElement('option');
+                option.value = job;
+                option.text = job;
+                
+                // 3. ميزة ذكية: إذا كان العنوان المضاف هو نفس عنوان الموظف الحالي، اجعله مختاراً
+                if (job === currentUserJob) {
+                    option.selected = true;
+                }
+                
+                selectMenu.add(option);
+            }
+        });
+    });
+</script>
+
+
+    <div class="mb-3">
+  <label for="degree" class="form-label">الدرجة*</label>
+  <select class="form-select" id="degree" name="degree" required>
+    <option value="">اختر الدرجة</option>
+    {% for i in range(1, 11) %}
+      <option value="{{ i }}" {% if employee['degree'] == i|string %}selected{% endif %}>{{ i }}</option>
+    {% endfor %}
+  </select>
+</div>
+
+<div class="mb-3">
+  <label for="stage" class="form-label">المرحلة*</label>
+  <select class="form-select" id="stage" name="stage" required>
+    <option value="">اختر المرحلة</option>
+    {% for i in range(1, 12) %}
+      <option value="{{ i }}" {% if employee['stage'] == i|string %}selected{% endif %}>{{ i }}</option>
+    {% endfor %}
+  </select>
+</div>
+
+
+            <div class="mb-3">
+              <label for="address" class="form-label">عنوان السكن</label>
+              <input type="text" class="form-control" id="address" name="address" value="{{ employee['address'] }}">
+            </div>
+
+            <div class="mb-3">
+              <label for="phone" class="form-label">الهاتف</label>
+              <input type="text" class="form-control" id="phone" name="phone" value="{{ employee['phone'] }}">
+            </div>
+
+            <div class="mb-3">
+              <label for="notes" class="form-label">الملاحظات</label>
+              <textarea class="form-control" id="notes" name="notes" rows="3" placeholder="اكتب ملاحظات هنا...">{{ employee['notes'] }}</textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- الملفات الحالية -->
+        <div class="mb-4">
+          <h5 class="card-title mb-3">📁 الملفات الحالية</h5>
+          {% if docs %}
+          <div class="row g-3">
+            {% for doc in docs %}
+            <div class="col-md-3 col-sm-6">
+              <div class="card file-card">
+                <div class="card-body text-center p-3">
+                  {% set ext = doc['filename'].split('.')[-1].lower() %}
+                  {% if ext in ['jpg','jpeg','png','gif','webp'] %}
+                    <a href="{{ url_for('static', filename='documents/employees/' ~ doc['filename']) }}" 
+                       target="_blank" 
+                       class="d-block image-preview-link">
+                      <img src="{{ url_for('static', filename='documents/employees/' ~ doc['filename']) }}" 
+                           class="img-thumbnail mb-2" 
+                           style="max-height: 100px; object-fit: cover; cursor: pointer;"
+                           alt="{{ doc['filename'] }}"
+                           title="انقر لفتح الصورة في نافذة جديدة">
+                    </a>
+                  {% else %}
+                    <div class="file-placeholder mb-2">
+                      <i class="fas fa-file-alt fa-2x text-muted"></i>
+                    </div>
+                  {% endif %}
+                  <small class="d-block text-truncate" title="{{ doc['filename'] }}">{{ doc['filename'] }}</small>
+                  <a href="{{ url_for('delete_doc_employee', doc_id=doc['id'], emp_id=employee['id']) }}" 
+                     class="btn btn-sm btn-outline-danger mt-2" 
+                     onclick="return confirm('هل أنت متأكد من حذف هذا الملف؟')">
+                    <i class="fas fa-trash"></i> حذف
+                  </a>
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+          {% else %}
+          <div class="alert alert-info text-center">
+            <i class="fas fa-info-circle"></i> لا توجد ملفات مرفقة
+          </div>
+          {% endif %}
+        </div>
+
+        <!-- إضافة ملفات جديدة -->
+        <div class="mb-4">
+          <label for="fileInputEdit" class="form-label">📤 إضافة ملفات جديدة</label>
+          <input type="file" class="form-control" id="fileInputEdit" name="docs" multiple accept="image/*,application/pdf">
+          <div class="form-text">يمكنك رفع عدة ملفات (صور أو PDF)</div>
+        </div>
+
+        <!-- معاينة الملفات الجديدة -->
+        <div class="mb-4">
+          <h6 class="mb-2">معاينة الملفات المحددة:</h6>
+          <div id="previewEdit" class="row g-2"></div>
+        </div>
+
+        <!-- أزرار التحميل -->
+        <div class="d-flex gap-2 justify-content-end pt-3 border-top">
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-save"></i> حفظ التعديلات
+          </button>
+          <a href="{{ url_for('view_employee', emp_id=employee['id']) }}" class="btn btn-secondary">
+            <i class="fas fa-times"></i> إلغاء
+          </a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<style>
+.file-card {
+  transition: transform 0.2s;
+  border: 1px solid #e9ecef;
+}
+.file-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+.file-placeholder {
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f8f9fa;
+  border-radius: 6px;
+}
+.form-label {
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+.card-title {
+  color: #495057;
+  font-weight: 600;
+}
+.image-preview-link:hover img {
+  opacity: 0.8;
+  border-color: #2c5aa0;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const fileInputEdit = document.getElementById('fileInputEdit');
+  const previewEdit = document.getElementById('previewEdit');
+
+  fileInputEdit.addEventListener('change', function() {
+    previewEdit.innerHTML = '';
+    
+    if (this.files.length > 0) {
+      Array.from(this.files).forEach(file => {
+        const col = document.createElement('div');
+        col.className = 'col-md-2 col-sm-3 col-4';
+        
+        const card = document.createElement('div');
+        card.className = 'card file-card';
+        card.style.fontSize = '0.8rem';
+        
+        const cardBody = document.createElement('div');
+        cardBody.className = 'card-body text-center p-2';
+        
+        if (file.type.startsWith('image/')) {
+          const img = document.createElement('img');
+          img.className = 'img-fluid rounded';
+          img.style.maxHeight = '60px';
+          img.style.objectFit = 'cover';
+          img.style.cursor = 'pointer';
+          
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            img.src = e.target.result;
+            // إضافة إمكانية فتح الصورة في نافذة جديدة للمعاينة أيضاً
+            img.onclick = function() {
+              window.open(e.target.result, '_blank');
+            };
+          };
+          reader.readAsDataURL(file);
+          cardBody.appendChild(img);
+        } else {
+          const fileIcon = document.createElement('div');
+          fileIcon.className = 'file-placeholder mb-1';
+          fileIcon.style.height = '50px';
+          
+          const icon = document.createElement('i');
+          icon.className = 'fas fa-file-pdf text-danger';
+          fileIcon.appendChild(icon);
+          cardBody.appendChild(fileIcon);
+        }
+        
+        const fileName = document.createElement('div');
+        fileName.className = 'text-truncate small';
+        fileName.textContent = file.name;
+        fileName.title = file.name;
+        cardBody.appendChild(fileName);
+        
+        card.appendChild(cardBody);
+        col.appendChild(card);
+        previewEdit.appendChild(col);
+      });
+    }
+  });
+});
+
+// إضافة تأثير عند المرور على الصور الحالية
+document.querySelectorAll('.image-preview-link img').forEach(img => {
+  img.style.transition = 'all 0.3s ease';
+});
+</script>
+{% endblock %}

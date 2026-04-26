@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block title %}عرض العلاوة{% endblock %}
+
+{% block content %}
+<div class="container" dir="rtl" style="max-width:1200px; margin:auto; padding:20px; font-family:sans-serif;">
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: start;">
+    
+    <!-- العمود الأيسر: معلومات العلاوة -->
+    <div style="background:#ffffff; border-radius:12px; box-shadow:0 6px 15px rgba(0,0,0,0.1); padding:24px;">
+      <h2 style="text-align:center; color:#222; margin-bottom:24px;">💰 تفاصيل العلاوة</h2>
+
+      <div style="display: flex; flex-direction: column; gap: 16px;">
+        <div><strong>رقم الكتاب:</strong> {{ allowance['book_number'] }}</div>
+        <div><strong>تاريخ الكتاب:</strong> {{ allowance['book_date'] }}</div>
+        <div><strong>الدرجة:</strong> {{ allowance['grade'] }}</div>
+        <div><strong>المرحلة:</strong> {{ allowance['stage'] }}</div>
+        <div><strong>تاريخ الاستحقاق:</strong> {{ allowance['entitlement_date'] }}</div>
+        <div><strong>ملاحظات:</strong> {{ allowance['notes'] if allowance['notes'] else '—' }}</div>
+      </div>
+
+      <!-- أزرار التحكم -->
+      <div style="margin-top:24px; display:flex; gap:12px; flex-wrap:wrap;">
+        <a href="{{ url_for('edit_allowance', allowance_id=allowance['id'], emp_id=allowance['employee_id']) }}" class="btn btn-primary">
+          <i class="fas fa-edit"></i> تعديل العلاوة
+        </a>
+        <a href="{{ url_for('index_allowance', emp_id=allowance['employee_id']) }}" class="btn btn-secondary">
+          <i class="fas fa-arrow-right"></i> عودة
+        </a>
+      </div>
+    </div>
+
+    <!-- العمود الأيمن: ملفات العلاوة -->
+    <div style="background:#ffffff; border-radius:12px; box-shadow:0 6px 15px rgba(0,0,0,0.1); padding:24px;">
+      <h3 style="text-align:center; margin-bottom:20px; color:#555;">📁 ملفات العلاوة</h3>
+      
+      {% if docs %}
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px;">
+        {% for doc in docs %}
+          {% set ext = doc['filename'].split('.')[-1].lower() %}
+          <div style="position:relative; border-radius:8px; overflow:hidden; box-shadow:0 2px 6px rgba(0,0,0,0.15); text-align:center;">
+            {% if ext in ['jpg','jpeg','png','gif','webp'] %}
+              <div class="image-container" data-image-src="{{ url_for('static', filename='documents/allowances/' ~ doc['filename']) }}">
+                <img id="img_{{ doc.id }}" src="{{ url_for('static', filename='documents/allowances/' ~ doc['filename']) }}" 
+                     style="width:100%; height:80px; object-fit:cover; cursor:pointer; transition:transform 0.3s;"
+                     alt="{{ doc['filename'] }}"
+                     title="انقر لعرض الصورة بتكبير">
+              </div>
+              <br>
+              <button type="button" class="btn btn-primary btn-sm" style="margin-top:4px; font-size:10px; padding:2px 6px;" onclick="printImage('img_{{ doc.id }}')">🖨️ طباعة</button>
+            {% else %}
+              <a href="{{ url_for('static', filename='documents/allowances/' ~ doc['filename']) }}" target="_blank" class="d-block">
+                <div style="width:100%; height:80px; display:flex; align-items:center; justify-content:center; background:#f0f0f0; font-size:12px; cursor:pointer;">
+                  <i class="fas fa-file-pdf text-danger"></i>
+                  <small style="margin-right:4px;">{{ doc['filename'] }}</small>
+                </div>
+              </a>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+      {% else %}
+        <div class="alert alert-info text-center">
+          <i class="fas fa-info-circle"></i> لا توجد ملفات مرفقة
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+</div>
+{% endblock %}

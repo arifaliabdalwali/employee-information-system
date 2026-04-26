@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm border-0" style="border-radius: 15px;">
+                <div class="card-header bg-primary text-white text-center" style="border-radius: 15px 15px 0 0;">
+                    <h5 class="mb-0">إدارة العناوين الوظيفية الإضافية</h5>
+                </div>
+                <div class="card-body p-4">
+                    <p class="text-muted small">ملاحظة: العناوين المضافة هنا تُحفظ في متصفحك الحالي فقط ولا تؤثر على قاعدة البيانات الرئيسية.</p>
+                    
+                    <label class="form-label fw-bold">إضافة عنوان جديد:</label>
+                    <div class="input-group mb-3">
+                        <input type="text" id="new_job_input" class="form-control" placeholder="مثلاً: خبير نظم معلومات">
+                        <button class="btn btn-success" onclick="saveToBrowser()">إضافة دائمية</button>
+                    </div>
+                    <div id="status" class="text-success fw-bold small mb-3"></div>
+
+                    <hr>
+
+                    <h6>العناوين التي أضفتها سابقاً:</h6>
+                    <ul id="custom_list" class="list-group">
+                        </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // وظيفة لعرض العناوين المضافة حالما تفتح الصفحة
+    document.addEventListener("DOMContentLoaded", function() {
+        displayJobs();
+    });
+
+    function saveToBrowser() {
+        const title = document.getElementById('new_job_input').value.trim();
+        const status = document.getElementById('status');
+        
+        if (title === "") {
+            alert("يرجى كتابة عنوان!");
+            return;
+        }
+
+        let jobs = JSON.parse(localStorage.getItem('my_custom_jobs')) || [];
+        
+        if (!jobs.includes(title)) {
+            jobs.push(title);
+            localStorage.setItem('my_custom_jobs', JSON.stringify(jobs));
+            status.innerText = "✅ تمت الإضافة بنجاح!";
+            document.getElementById('new_job_input').value = "";
+            displayJobs(); // تحديث القائمة المعروضة
+        } else {
+            alert("هذا العنوان مضاف مسبقاً!");
+        }
+    }
+
+    function displayJobs() {
+        const list = document.getElementById('custom_list');
+        let jobs = JSON.parse(localStorage.getItem('my_custom_jobs')) || [];
+        
+        list.innerHTML = ""; // مسح القائمة الحالية
+        
+        if (jobs.length === 0) {
+            list.innerHTML = "<li class='list-group-item text-muted small text-center'>لا توجد عناوين مضافة يدوياً بعد.</li>";
+            return;
+        }
+
+        jobs.forEach((job, index) => {
+            const li = document.createElement('li');
+            li.className = "list-group-item d-flex justify-content-between align-items-center";
+            li.innerHTML = `
+                ${job}
+                <button class="btn btn-sm btn-outline-danger" onclick="deleteJob(${index})">حذف</button>
+            `;
+            list.appendChild(li);
+        });
+    }
+
+    function deleteJob(index) {
+        let jobs = JSON.parse(localStorage.getItem('my_custom_jobs')) || [];
+        jobs.splice(index, 1);
+        localStorage.setItem('my_custom_jobs', JSON.stringify(jobs));
+        displayJobs();
+    }
+</script>
+{% endblock %}

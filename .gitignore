@@ -1,0 +1,37 @@
+# Python virtual environment
+venv/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# IDE folders
+.idea/
+.vscode/
+.claude/
+
+# Logs and errors
+*.log
+error.txt
+_nul
+
+# Database files - مهم لا ترفع بيانات الموظفين
+*.db
+*.sqlite
+*.sqlite3
+
+# Backups
+backups/
+
+# Build files
+build/
+dist/
+*.spec
+
+# Environment files
+.env
+
+# System files
+.DS_Store
+Thumbs.db

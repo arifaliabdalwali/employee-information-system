@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>طباعة قائمة الموظفين</title>
+    <!-- نفس التصميم والأنماط المستخدمة في all_employees.html -->
+    <style>
+        /* أنماط الطباعة */
+        @media print {
+            @page {
+                size: A4 landscape;
+                margin: 5mm;
+            }
+            
+            .no-print, 
+            .btn,
+            .filter-section,
+            .search-box,
+            .form-control,
+            .btn-group,
+            .dropdown,
+            .navbar,
+            .sidebar,
+            footer {
+                display: none !important;
+            }
+            
+            body {
+                font-family: 'Arial', sans-serif;
+                font-size: 10px;
+                margin: 0;
+                padding: 0;
+            }
+            
+            .print-header {
+                display: block !important;
+                text-align: center;
+                margin-bottom: 15px;
+                padding-bottom: 10px;
+                border-bottom: 2px solid #000;
+            }
+            
+            table {
+                font-size: 9px;
+                width: 100%;
+            }
+            
+            th, td {
+                padding: 4px !important;
+            }
+        }
+        
+        /* أنماط العرض العادية */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f8f9fa;
+        }
+        
+        .print-header {
+            display: none;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .print-header h2 {
+            margin: 0;
+            color: #333;
+        }
+        
+        .print-header p {
+            margin: 5px 0;
+            color: #666;
+        }
+        
+        /* نفس تنسيق الجدول الأصلي */
+        .table-container {
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            padding: 15px;
+            margin-top: 20px;
+        }
+        
+        .table {
+            width: 100%;
+            margin-bottom: 1rem;
+            color: #212529;
+            border-collapse: collapse;
+        }
+        
+        .table th,
+        .table td {
+            padding: 0.75rem;
+            vertical-align: top;
+            border-top: 1px solid #dee2e6;
+            text-align: right;
+        }
+        
+        .table thead th {
+            vertical-align: bottom;
+            border-bottom: 2px solid #dee2e6;
+            background-color: #f8f9fa;
+            font-weight: bold;
+        }
+        
+        .table tbody tr:nth-of-type(odd) {
+            background-color: rgba(0,0,0,.02);
+        }
+        
+        .table-hover tbody tr:hover {
+            background-color: rgba(0,0,0,.075);
+        }
+        
+        /* أزرار الطباعة */
+        .print-controls {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            background-color: white;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+        }
+        
+        .btn-print {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 5px;
+        }
+        
+        .btn-back {
+            background-color: #6c757d;
+            color: white;
+            text-decoration: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <!-- عناصر التحكم بالطباعة -->
+    <div class="no-print print-controls">
+        <button onclick="window.print()" class="btn-print">
+            <i class="fas fa-print"></i> طباعة الآن
+        </button>
+        <a href="{{ url_for('all_employees') }}" class="btn-back">
+            <i class="fas fa-arrow-right"></i> العودة
+        </a>
+    </div>
+    
+    <!-- رأس الطباعة -->
+    <div class="print-header">
+        <h2>قائمة الموظفين</h2>
+        <p>تاريخ الطباعة: {{ now.strftime('%Y-%m-%d %H:%M:%S') if now else '' }}</p>
+        <p>عدد السجلات: {{ employees|length }}</p>
+        {% if search_query %}
+        <p>نتيجة البحث عن: "{{ search_query }}"</p>
+        {% endif %}
+    </div>
+    
+    <!-- نفس جدول كل الموظفين -->
+    <div class="container-fluid table-container">
+        <div class="table-responsive">
+            <table class="table table-hover table-bordered">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        {% if 'name' in display_fields %}
+                        <th>الاسم</th>
+                        {% endif %}
+                        {% if 'dept' in display_fields %}
+                        <th>القسم</th>
+                        {% endif %}
+                        {% if 'job' in display_fields %}
+                        <th>المنصب</th>
+                        {% endif %}
+                        {% if 'phone' in display_fields %}
+                        <th>الهاتف</th>
+                        {% endif %}
+                        {% if 'certificate' in display_fields %}
+                        <th>الشهادة</th>
+                        {% endif %}
+                        {% if 'job_title' in display_fields %}
+                        <th>المسمى الوظيفي</th>
+                        {% endif %}
+                        {% if 'gender' in display_fields %}
+                        <th>الجنس</th>
+                        {% endif %}
+                        {% if 'degree' in display_fields %}
+                        <th>الدرجة</th>
+                        {% endif %}
+                        {% if 'stage' in display_fields %}
+                        <th>المرحلة</th>
+                        {% endif %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for employee in employees %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        {% if 'name' in display_fields %}
+                        <td>{{ employee.name }}</td>
+                        {% endif %}
+                        {% if 'dept' in display_fields %}
+                        <td>{{ employee.dept }}</td>
+                        {% endif %}
+                        {% if 'job' in display_fields %}
+                        <td>{{ employee.job }}</td>
+                        {% endif %}
+                        {% if 'phone' in display_fields %}
+                        <td>{{ employee.phone }}</td>
+                        {% endif %}
+                        {% if 'certificate' in display_fields %}
+                        <td>{{ employee.certificate }}</td>
+                        {% endif %}
+                        {% if 'job_title' in display_fields %}
+                        <td>{{ employee.job_title }}</td>
+                        {% endif %}
+                        {% if 'gender' in display_fields %}
+                        <td>{{ employee.gender }}</td>
+                        {% endif %}
+                        {% if 'degree' in display_fields %}
+                        <td>{{ employee.degree }}</td>
+                        {% endif %}
+                        {% if 'stage' in display_fields %}
+                        <td>{{ employee.stage }}</td>
+                        {% endif %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <script>
+        // إضافة وقت الطباعة
+        document.addEventListener('DOMContentLoaded', function() {
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('ar-SA') + ' ' + now.toLocaleTimeString('ar-SA');
+            
+            // تحديث رأس الطباعة
+            const dateElement = document.querySelector('.print-header p:nth-child(2)');
+            if (dateElement && !dateElement.textContent.includes('تاريخ الطباعة')) {
+                dateElement.textContent = 'تاريخ الطباعة: ' + dateStr;
+            }
+            
+            // الطباعة التلقائية بعد تحميل الصفحة (اختياري)
+            setTimeout(() => {
+                if (window.location.search.includes('auto_print=true')) {
+                    window.print();
+                }
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

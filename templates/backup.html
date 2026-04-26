@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>النسخ الاحتياطي</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+    <style>
+        /* خلفية الصفحة */
+        body {
+            background: #e9ecef;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        /* تصميم البطاقة */
+        .card {
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+
+        .card-header {
+            font-size: 1.3rem;
+            letter-spacing: 0.5px;
+            border-top-left-radius: 12px;
+            border-top-right-radius: 12px;
+        }
+
+        .card-body {
+            padding: 2rem;
+        }
+
+        /* زر العودة */
+        .btn-home {
+            background: #6c757d;
+            color: #fff;
+            font-weight: bold;
+            border-radius: 8px;
+            padding: 0.6rem 1.2rem;
+            transition: 0.3s;
+        }
+
+        .btn-home:hover {
+            background: #5a6268;
+            color: #fff;
+        }
+
+        /* ألوان الأزرار */
+        .btn-backup {
+            background: #ffc107;
+            color: #212529;
+            font-weight: bold;
+            border-radius: 8px;
+            padding: 0.6rem 1.4rem;
+            transition: 0.3s;
+        }
+        .btn-backup:hover {
+            background: #e0a800;
+            color: #fff;
+        }
+
+        .btn-restore {
+            background: #28a745;
+            color: #fff;
+            font-weight: bold;
+            border-radius: 6px;
+            padding: 0.4rem 1rem;
+            transition: 0.3s;
+        }
+        .btn-restore:hover {
+            background: #218838;
+            color: #fff;
+        }
+
+        .btn-delete {
+            background: #dc3545;
+            color: #fff;
+            font-weight: bold;
+            border-radius: 6px;
+            padding: 0.4rem 1rem;
+            transition: 0.3s;
+        }
+        .btn-delete:hover {
+            background: #c82333;
+            color: #fff;
+        }
+
+        /* الجدول */
+        table th, table td {
+            vertical-align: middle !important;
+        }
+
+        table tbody tr:hover {
+            background-color: #f1f3f5;
+        }
+
+        /* رسائل الفلاش */
+        .alert {
+            border-radius: 8px;
+            font-weight: bold;
+        }
+
+        /* رأس الصفحة */
+        h1 {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: #343a40;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container mt-5">
+
+    <h1>إدارة النسخ الاحتياطية للنظام</h1>
+
+  
+
+  <!-- زر العودة للصفحة الرئيسية -->
+    <div class="mb-4 text-center">
+        <a href="{{ url_for('index') }}" class="btn btn-home btn-lg">
+            العودة للصفحة الرئيسية
+        </a>
+    </div>
+
+
+
+    <!-- بطاقة إنشاء نسخة احتياطية -->
+    <div class="card shadow mb-5">
+        <div class="card-header bg-warning fw-bold text-center">
+            
+        </div>
+        <div class="card-body text-center">
+            <form method="post" action="{{ url_for('backup') }}"
+                  onsubmit="return confirm('هل أنت متأكد من إنشاء نسخة احتياطية؟');">
+                <button class="btn btn-backup btn-lg">
+                    إنشاء النسخة الآن
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- رسائل الفلاش -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }} alert-dismissible fade show text-center" role="alert">
+              {{ message }}
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <!-- بطاقة عرض النسخ الاحتياطية -->
+    <div class="card shadow mb-5">
+        <div class="card-header bg-dark text-white fw-bold text-center">
+            النسخ الاحتياطية المتوفرة
+        </div>
+        <div class="card-body">
+
+            {% if backups %}
+                <table class="table table-bordered table-hover text-center align-middle">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>اسم النسخة</th>
+                            <th>استعادة</th>
+                            <th>حذف</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for b in backups %}
+                    <tr>
+                        <td>{{ b }}</td>
+                        <td>
+                            <form method="post"
+                                  action="{{ url_for('restore', backup_name=b) }}"
+                                  onsubmit="return confirm('سيتم استبدال جميع البيانات، هل أنت متأكد؟');">
+                                <button class="btn btn-restore btn-sm">
+                                    استعادة
+                                </button>
+                            </form>
+                        </td>
+                        <td>
+                            <form method="post"
+                                  action="{{ url_for('delete_backup', backup_name=b) }}"
+                                  onsubmit="return confirm('هل تريد حذف هذه النسخة الاحتياطية نهائيًا؟');">
+                                <button class="btn btn-delete btn-sm">
+                                    حذف
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p class="text-muted text-center fs-5">لا توجد نسخ احتياطية</p>
+            {% endif %}
+
+        </div>
+    </div>
+
+</div>
+
+<script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <title>تسجيل الدخول</title>
+    <style>
+        body {
+            font-family: Tahoma, Arial;
+            background: url('https://tryengineering.org/wp-content/uploads/bigstock-Concept-Of-Programming-Coding-375861967-1024x576.jpg') no-repeat center center fixed;
+            background-size: cover;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .login-box {
+            background: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            width: 350px;
+            text-align: center;
+        }
+        h2 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+        }
+        button, a {
+            width: 100%;
+            display: inline-block;
+            padding: 12px;
+            margin-top: 10px;
+            text-decoration: none;
+            text-align: center;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        button {
+            background: #007bff;
+            color: #fff;
+            border: none;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        a.back-btn {
+            background: #6c757d;
+            color: #fff;
+        }
+        a.back-btn:hover {
+            background: #495057;
+        }
+        .error {
+            color: red;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-box">
+        <h2>تسجيل الدخول</h2>
+        {% if error %}
+            <div class="error">{{ error }}</div>
+        {% endif %}
+        <h1>نظام ادارة الموظفين</h1>
+        <!-- زر الدخول -->
+        <form method="post">
+            <input type="text" name="username" value="">
+            <input type="password" name="password" value="">
+
+           
+            <button type="submit">دخول</button>
+        </form>
+
+        <!-- زر العودة إلى welcome -->
+        <a href="{{ url_for('welcome') }}" class="back-btn">رجوع</a>
+    </div>
+</body>
+</html>

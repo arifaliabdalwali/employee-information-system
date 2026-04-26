@@ -1,0 +1,646 @@
+{% extends "base.html" %}
+{% block title %}تعديل العلاوة{% endblock %}
+
+{% block content %}
+<style>
+    /* إضافة ستايل التقويم فقط */
+    .date-input-wrapper {
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+
+    .date-input-wrapper input {
+        width: 100%;
+        padding-left: 45px !important;
+    }
+
+    .calendar-icon {
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 20px;
+        color: #0d6efd;
+        cursor: pointer;
+        z-index: 10;
+    }
+
+    /* Calendar Modal Styles */
+    .calendar-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.5);
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .calendar-container {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        width: 350px;
+        max-width: 90%;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+
+    .calendar-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+        gap: 10px;
+    }
+
+    .calendar-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #333;
+        text-align: center;
+        flex: 1;
+    }
+
+    .calendar-nav button {
+        background: #f0f0f0;
+        border: none;
+        width: 35px;
+        height: 35px;
+        border-radius: 6px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .calendar-nav button:hover {
+        background: #0d6efd;
+        color: white;
+    }
+
+    .calendar-selectors {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 15px;
+        justify-content: center;
+    }
+
+    .calendar-select {
+        padding: 6px 10px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        font-size: 14px;
+        background: white;
+        color: #333;
+        cursor: pointer;
+    }
+
+    .calendar-weekdays {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 5px;
+        margin-bottom: 10px;
+        text-align: center;
+        font-weight: 600;
+        color: #666;
+        font-size: 12px;
+    }
+
+    .calendar-days {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 5px;
+    }
+
+    .calendar-day {
+        height: 35px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: all 0.3s ease;
+    }
+
+    .calendar-day:hover {
+        background: #f0f0f0;
+    }
+
+    .calendar-day.selected {
+        background: #0d6efd;
+        color: white;
+    }
+
+    .calendar-day.today {
+        border: 2px solid #198754;
+    }
+
+    .calendar-day.other-month {
+        color: #ccc;
+    }
+
+    .calendar-actions {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 15px;
+    }
+
+    .calendar-actions button {
+        padding: 8px 16px;
+        border-radius: 6px;
+        border: none;
+        font-weight: 500;
+        cursor: pointer;
+        font-size: 14px;
+    }
+
+    .calendar-actions .btn-today {
+        background: #e0e0e0;
+        color: #333;
+    }
+
+    .calendar-actions .btn-close {
+        background: #dc3545;
+        color: white;
+    }
+
+    /* الأنماط الحالية من الصفحة الأصلية */
+    .file-card {
+        transition: transform 0.2s;
+        border: 1px solid #e9ecef;
+    }
+    .file-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    .file-placeholder {
+        height: 100px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #f8f9fa;
+        border-radius: 6px;
+    }
+    .form-label {
+        font-weight: 600;
+        margin-bottom: 8px;
+    }
+    .card-title {
+        color: #495057;
+        font-weight: 600;
+    }
+    .image-preview-link:hover img {
+        opacity: 0.8;
+        border-color: #2c5aa0;
+    }
+</style>
+
+<div class="container" dir="rtl">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0">✏️ تعديل العلاوة</h1>
+    <a href="{{ url_for('index_allowance', emp_id=allowance['employee_id']) }}" class="btn btn-outline-secondary">
+      <i class="fas fa-arrow-right"></i> العودة
+    </a>
+  </div>
+
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <form method="POST" enctype="multipart/form-data" id="editAllowanceForm">
+        <div class="row">
+          <div class="col-md-6">
+            <div class="mb-3">
+              <label for="book_number" class="form-label">رقم الكتاب *</label>
+              <input type="text" class="form-control" id="book_number" name="book_number" value="{{ allowance['book_number'] }}" required>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">تاريخ الكتاب</label>
+              <!-- استبدل حقل التاريخ القديم بالتقويم الجديد -->
+              <div class="date-input-wrapper">
+                <input type="text" id="book_date_display" readonly required class="form-control" 
+                       placeholder="انقر لاختيار التاريخ" value="{{ allowance['book_date'] }}">
+                <span class="calendar-icon" onclick="showCalendar('book')">📅</span>
+                <input type="hidden" id="book_date_value" name="book_date" required value="{{ allowance['book_date'] }}">
+              </div>
+              <div style="font-size: 12px; color: #666; margin-top: 5px;">
+                التنسيق: yyyy/mm/dd
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="grade" class="form-label">الدرجة</label>
+              <input type="text" class="form-control" id="grade" name="grade" value="{{ allowance['grade'] }}">
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <div class="mb-3">
+              <label for="stage" class="form-label">المرحلة</label>
+              <input type="text" class="form-control" id="stage" name="stage" value="{{ allowance['stage'] }}">
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">تاريخ الاستحقاق</label>
+              <!-- استبدل حقل التاريخ القديم بالتقويم الجديد -->
+              <div class="date-input-wrapper">
+                <input type="text" id="entitlement_date_display" readonly class="form-control" 
+                       placeholder="انقر لاختيار التاريخ" value="{{ allowance['entitlement_date'] }}">
+                <span class="calendar-icon" onclick="showCalendar('entitlement')">📅</span>
+                <input type="hidden" id="entitlement_date_value" name="entitlement_date" value="{{ allowance['entitlement_date'] }}">
+              </div>
+              <div style="font-size: 12px; color: #666; margin-top: 5px;">
+                التنسيق: yyyy/mm/dd
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="notes" class="form-label">الملاحظات</label>
+          <textarea class="form-control" id="notes" name="notes" rows="3" placeholder="أدخل الملاحظات هنا...">{{ allowance['notes'] }}</textarea>
+        </div>
+
+        <!-- الملفات الحالية -->
+        <div class="mb-4">
+          <h5 class="card-title mb-3">📁 الملفات الحالية</h5>
+          {% if docs %}
+          <div class="row g-3">
+            {% for doc in docs %}
+            <div class="col-md-3 col-sm-6">
+              <div class="card file-card">
+                <div class="card-body text-center p-3">
+                  {% set ext = doc['filename'].split('.')[-1].lower() %}
+                  {% if ext in ['jpg','jpeg','png','gif','webp'] %}
+                    <a href="{{ url_for('static', filename='documents/allowances/' ~ doc['filename']) }}" 
+                       target="_blank" 
+                       class="d-block image-preview-link">
+                      <img src="{{ url_for('static', filename='documents/allowances/' ~ doc['filename']) }}" 
+                           class="img-thumbnail mb-2" 
+                           style="max-height: 100px; object-fit: cover; cursor: pointer;"
+                           alt="{{ doc['filename'] }}"
+                           title="انقر لفتح الصورة في نافذة جديدة">
+                    </a>
+                  {% else %}
+                    <div class="file-placeholder mb-2">
+                      <i class="fas fa-file-alt fa-2x text-muted"></i>
+                    </div>
+                  {% endif %}
+                  <small class="d-block text-truncate" title="{{ doc['filename'] }}">{{ doc['filename'] }}</small>
+                  <a href="{{ url_for('delete_allowance_doc', doc_id=doc['id'], allowance_id=allowance['id'], emp_id=allowance['employee_id']) }}" 
+                     class="btn btn-sm btn-outline-danger mt-2" 
+                     onclick="return confirm('هل أنت متأكد من حذف هذا الملف؟')">
+                    <i class="fas fa-trash"></i> حذف
+                  </a>
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+          {% else %}
+          <div class="alert alert-info text-center">
+            <i class="fas fa-info-circle"></i> لا توجد ملفات مرفقة
+          </div>
+          {% endif %}
+        </div>
+
+        <!-- إضافة ملفات جديدة -->
+        <div class="mb-4">
+          <label for="fileInputAllowance" class="form-label">📤 إضافة ملفات جديدة</label>
+          <input type="file" class="form-control" id="fileInputAllowance" name="docs" multiple accept="image/*,application/pdf">
+          <div class="form-text">يمكنك رفع عدة ملفات (صور أو PDF)</div>
+        </div>
+
+        <!-- معاينة الملفات الجديدة -->
+        <div class="mb-4">
+          <h6 class="mb-2">معاينة الملفات المحددة:</h6>
+          <div id="previewAllowance" class="row g-2"></div>
+        </div>
+
+        <!-- أزرار التحميل -->
+        <div class="d-flex gap-2 justify-content-end pt-3 border-top">
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-save"></i> حفظ التعديلات
+          </button>
+          <a href="{{ url_for('index_allowance', emp_id=allowance['employee_id']) }}" class="btn btn-secondary">
+            <i class="fas fa-times"></i> إلغاء
+          </a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Calendar Modal -->
+<div id="calendarModal" class="calendar-modal">
+    <div class="calendar-container">
+        <div class="calendar-header">
+            <div class="calendar-nav">
+                <button onclick="changeMonth(-1)">‹</button>
+            </div>
+            <div class="calendar-title" id="calendarMonthYear"></div>
+            <div class="calendar-nav">
+                <button onclick="changeMonth(1)">›</button>
+            </div>
+        </div>
+        
+        <div class="calendar-selectors">
+            <select id="yearSelect" class="calendar-select" onchange="changeYear(this.value)"></select>
+            <select id="monthSelect" class="calendar-select" onchange="changeMonthSelect(this.value)"></select>
+        </div>
+        
+        <div class="calendar-weekdays">
+            <div>أحد</div>
+            <div>اثنين</div>
+            <div>ثلاثاء</div>
+            <div>أربعاء</div>
+            <div>خميس</div>
+            <div>جمعة</div>
+            <div>سبت</div>
+        </div>
+        
+        <div class="calendar-days" id="calendarDays"></div>
+        
+        <div class="calendar-actions">
+            <button class="btn-today" onclick="setToday()">اليوم</button>
+            <button class="btn-close" onclick="hideCalendar()">إغلاق</button>
+        </div>
+    </div>
+</div>
+
+<script>
+// ============ Calendar Functions ============
+let currentDate = new Date();
+let selectedDate = null;
+let currentDateField = 'book'; // 'book' or 'entitlement'
+
+const monthNames = [
+    'يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو',
+    'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'
+];
+
+function showCalendar(field) {
+    currentDateField = field;
+    document.getElementById('calendarModal').style.display = 'flex';
+    populateYearSelect();
+    populateMonthSelect();
+    
+    // Set current date based on the field being edited
+    const displayField = document.getElementById(`${field}_date_display`);
+    if (displayField.value) {
+        const dateParts = displayField.value.split('/');
+        if (dateParts.length === 3) {
+            currentDate = new Date(parseInt(dateParts[0]), parseInt(dateParts[1]) - 1, parseInt(dateParts[2]));
+        }
+    }
+    
+    renderCalendar();
+}
+
+function hideCalendar() {
+    document.getElementById('calendarModal').style.display = 'none';
+}
+
+function changeMonth(direction) {
+    currentDate.setMonth(currentDate.getMonth() + direction);
+    updateSelectorsFromCurrentDate();
+    renderCalendar();
+}
+
+function changeYear(year) {
+    currentDate.setFullYear(parseInt(year));
+    renderCalendar();
+}
+
+function changeMonthSelect(monthIndex) {
+    currentDate.setMonth(parseInt(monthIndex));
+    renderCalendar();
+}
+
+function populateYearSelect() {
+    const yearSelect = document.getElementById('yearSelect');
+    yearSelect.innerHTML = '';
+    
+    const currentYear = new Date().getFullYear();
+    for (let year = currentYear - 10; year <= currentYear + 10; year++) {
+        const option = document.createElement('option');
+        option.value = year;
+        option.textContent = year;
+        if (year === currentDate.getFullYear()) {
+            option.selected = true;
+        }
+        yearSelect.appendChild(option);
+    }
+}
+
+function populateMonthSelect() {
+    const monthSelect = document.getElementById('monthSelect');
+    monthSelect.innerHTML = '';
+    
+    monthNames.forEach((month, index) => {
+        const option = document.createElement('option');
+        option.value = index;
+        option.textContent = month;
+        if (index === currentDate.getMonth()) {
+            option.selected = true;
+        }
+        monthSelect.appendChild(option);
+    });
+}
+
+function updateSelectorsFromCurrentDate() {
+    document.getElementById('yearSelect').value = currentDate.getFullYear();
+    document.getElementById('monthSelect').value = currentDate.getMonth();
+}
+
+function renderCalendar() {
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
+    
+    document.getElementById('calendarMonthYear').textContent = 
+        `${monthNames[month]} ${year}`;
+    
+    updateSelectorsFromCurrentDate();
+    
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const daysInMonth = lastDay.getDate();
+    const startingDay = firstDay.getDay();
+    
+    const calendarDays = document.getElementById('calendarDays');
+    calendarDays.innerHTML = '';
+    
+    for (let i = 0; i < startingDay; i++) {
+        const emptyDay = document.createElement('div');
+        emptyDay.className = 'calendar-day other-month';
+        calendarDays.appendChild(emptyDay);
+    }
+    
+    for (let day = 1; day <= daysInMonth; day++) {
+        const dayElement = document.createElement('div');
+        dayElement.className = 'calendar-day';
+        dayElement.textContent = day;
+        
+        const thisDate = new Date(year, month, day);
+        
+        const today = new Date();
+        if (thisDate.toDateString() === today.toDateString()) {
+            dayElement.classList.add('today');
+        }
+        
+        if (selectedDate && thisDate.toDateString() === selectedDate.toDateString()) {
+            dayElement.classList.add('selected');
+        }
+        
+        dayElement.onclick = () => selectDate(thisDate);
+        calendarDays.appendChild(dayElement);
+    }
+}
+
+function selectDate(date) {
+    selectedDate = date;
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    
+    const formattedDate = `${year}/${month}/${day}`;
+    
+    if (currentDateField === 'book') {
+        document.getElementById('book_date_display').value = formattedDate;
+        document.getElementById('book_date_value').value = formattedDate;
+    } else if (currentDateField === 'entitlement') {
+        document.getElementById('entitlement_date_display').value = formattedDate;
+        document.getElementById('entitlement_date_value').value = formattedDate;
+    }
+    
+    hideCalendar();
+}
+
+function setToday() {
+    const today = new Date();
+    selectDate(today);
+    currentDate = new Date();
+    renderCalendar();
+}
+
+// ============ Initialize Dates on Page Load ============
+document.addEventListener('DOMContentLoaded', () => {
+    // Book date initialization
+    const bookDateDisplay = document.getElementById('book_date_display');
+    const bookDateValue = document.getElementById('book_date_value');
+    const existingBookDate = bookDateDisplay.value;
+    
+    if (existingBookDate && existingBookDate.trim() !== '') {
+        bookDateDisplay.value = existingBookDate;
+        bookDateValue.value = existingBookDate;
+    }
+    
+    // Entitlement date initialization
+    const entitlementDateDisplay = document.getElementById('entitlement_date_display');
+    const entitlementDateValue = document.getElementById('entitlement_date_value');
+    const existingEntitlementDate = entitlementDateDisplay.value;
+    
+    if (existingEntitlementDate && existingEntitlementDate.trim() !== '') {
+        entitlementDateDisplay.value = existingEntitlementDate;
+        entitlementDateValue.value = existingEntitlementDate;
+    }
+    
+    // Set current date to today for calendar
+    currentDate = new Date();
+    selectedDate = null;
+    
+    // Initialize calendar
+    populateYearSelect();
+    populateMonthSelect();
+    renderCalendar();
+});
+
+// إغلاق التقويم عند النقر خارج النافذة
+document.addEventListener('click', (e) => {
+    const calendarModal = document.getElementById('calendarModal');
+    const calendarContainer = document.querySelector('.calendar-container');
+    const calendarIcons = document.querySelectorAll('.calendar-icon');
+    
+    if (calendarModal.style.display === 'flex') {
+        let isIcon = false;
+        calendarIcons.forEach(icon => {
+            if (e.target === icon) isIcon = true;
+        });
+        
+        if (!calendarContainer.contains(e.target) && !isIcon) {
+            hideCalendar();
+        }
+    }
+});
+
+// ============ ملفات JavaScript الأصلية للصفحة ============
+document.addEventListener('DOMContentLoaded', function() {
+  const fileInputAllowance = document.getElementById('fileInputAllowance');
+  const previewAllowance = document.getElementById('previewAllowance');
+
+  fileInputAllowance.addEventListener('change', function() {
+    previewAllowance.innerHTML = '';
+    
+    if (this.files.length > 0) {
+      Array.from(this.files).forEach(file => {
+        const col = document.createElement('div');
+        col.className = 'col-md-2 col-sm-3 col-4';
+        
+        const card = document.createElement('div');
+        card.className = 'card file-card';
+        card.style.fontSize = '0.8rem';
+        
+        const cardBody = document.createElement('div');
+        cardBody.className = 'card-body text-center p-2';
+        
+        if (file.type.startsWith('image/')) {
+          const img = document.createElement('img');
+          img.className = 'img-fluid rounded';
+          img.style.maxHeight = '60px';
+          img.style.objectFit = 'cover';
+          img.style.cursor = 'pointer';
+          
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            img.src = e.target.result;
+            img.onclick = function() {
+              window.open(e.target.result, '_blank');
+            };
+          };
+          reader.readAsDataURL(file);
+          cardBody.appendChild(img);
+        } else {
+          const fileIcon = document.createElement('div');
+          fileIcon.className = 'file-placeholder mb-1';
+          fileIcon.style.height = '50px';
+          
+          const icon = document.createElement('i');
+          icon.className = 'fas fa-file-pdf text-danger';
+          fileIcon.appendChild(icon);
+          cardBody.appendChild(fileIcon);
+        }
+        
+        const fileName = document.createElement('div');
+        fileName.className = 'text-truncate small';
+        fileName.textContent = file.name;
+        fileName.title = file.name;
+        cardBody.appendChild(fileName);
+        
+        card.appendChild(cardBody);
+        col.appendChild(card);
+        previewAllowance.appendChild(col);
+      });
+    }
+  });
+
+  // إضافة تأثير عند المرور على الصور الحالية
+  document.querySelectorAll('.image-preview-link img').forEach(img => {
+    img.style.transition = 'all 0.3s ease';
+  });
+});
+</script>
+{% endblock %}

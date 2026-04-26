@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block title %}الأقسام{% endblock %}
+
+{% block content %}
+
+
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2> قسم تكنولوجيا المعلومات والاتصالات والذكاء الاصطناعي  </h2>
+    <a href="{{ url_for('add_employee') }}" class="btn btn-primary btn-lg">
+      ➕ إضافة موظف جديد
+    </a>
+  </div>
+
+  <!-- أزرار الأقسام -->
+  <div class="row">
+    {% for dept in departments %}
+    <div class="col-md-3 mb-4">
+      <a href="{{ url_for('department_employees', dept_name=dept.name) }}" 
+         class="btn btn-outline-primary btn-lg w-100 h-100 p-4 d-flex flex-column justify-content-center align-items-center department-btn">
+        <div class="mb-2" style="font-size: 2rem;">
+        {% if dept.name == 'مدير القسم' %}👨‍💼
+        {% elif dept.name == 'الادارية' %}🗂️
+        {% elif dept.name == 'الصيانة' %}🛠️
+        {% elif dept.name == 'نظم المعلومات' %}💻
+        {% elif dept.name == 'الشبكات' %}📶
+        {% elif dept.name == 'الحكومة الإلكترونية' %}🌐
+        {% elif dept.name == 'تصميم المواقع' %}🖼️
+        {% elif dept.name == 'الذكاء الاصطناعي' %}𝐀𝐈
+         {% endif %}
+        </div>
+        <h5 class="mb-1">{{ dept.name }}</h5>
+        <small class="text-muted">{{ dept.employee_count }} موظف</small>
+      </a>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- عرض سريع لجميع الموظفين -->
+  <div class="mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h3>جميع الموظفين</h3>
+      <a href="{{ url_for('all_employees') }}" class="btn btn-secondary">عرض الكل</a>
+    </div>
+    <div class="card">
+      <div class="card-body">
+        <p class="card-text">إجمالي عدد الموظفين: <strong>{{ total_employees }}</strong></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.department-btn {
+  transition: all 0.3s ease;
+  border: 2px solid #007bff;
+  border-radius: 10px;
+  text-decoration: none;
+  color: #007bff;
+  min-height: 120px;
+}
+
+.department-btn:hover {
+  background-color: #007bff;
+  color: white;
+  transform: translateY(-5px);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+</style>
+{% endblock %}
