@@ -3163,8 +3163,5 @@ def delete_backup(backup_name):
         flash("النسخة غير موجودة", "warning")
     return redirect(url_for("backup_page"))
 
-
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True, use_reloader=False)
-
-
+    app.run(debug=False, host="0.0.0.0", port=5000)
